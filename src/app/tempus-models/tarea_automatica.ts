@@ -10,6 +10,7 @@ export class TareaAutomatica {
         public max_horas_dia: number,
         public min_horas_dia: number,
         public antelacion_notificacion: number,
+        public duracion_estimada_medida: string,
     ) { }
 
 }

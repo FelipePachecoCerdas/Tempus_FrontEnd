@@ -1,7 +1,8 @@
 export class Etiqueta {
-    constructor (
+    constructor(
         public id_usuario: number,
-        public nombre_etiqueta: string
-    ) {}
-    
+        public nombre_etiqueta: string,
+        public color: string
+    ) { }
+
 }

@@ -262,13 +262,13 @@ export class CalendarioTareasComponent {
   tareas: Tarea[] = [
     new Tarea(0, 0, 1, undefined, "Investigar sobre blockchain",
       "Investigar y documentar fuentes sobre la tecnología de blockchain",
-      undefined, "0", "Correo electronico", "Manual"),
+      undefined, "0", "Correo electronico", "Manual", undefined),
     new Tarea(1, 0, 1, undefined, "Generar documento de investigación",
       "De acuerdo con lo investigado, generar un reporte de investigación",
-      undefined, "1", "Correo Electronico", "Manual"),
+      undefined, "1", "Correo Electronico", "Manual", undefined),
     new Tarea(2, 0, 1, undefined, "Entrenamiento en Solidity, Truffle y Ganache",
       "Investigar y entrenar sobre el lenguaje de Solidity con el uso del compilador Truffle y la herramienta Ganache",
-      undefined, "1", "Celular", "Automatico"),
+      undefined, "1", "Celular", "Automatico", undefined),
   ]
 
   tareas_periodos: TareaPeriodo[] = [
@@ -278,18 +278,18 @@ export class CalendarioTareasComponent {
   ]
 
   tareas_automaticas: TareaAutomatica[] = [
-    new TareaAutomatica(2, "Medio", "Alta", 270, new Date(), undefined, "LKJ", undefined, undefined, 10)
+    new TareaAutomatica(2, "Medio", "Alta", 270, new Date(), undefined, "LKJ", undefined, undefined, 10, "minutos")
   ];
 
 
 
-  tareaActual: Tarea = new Tarea(undefined, undefined, undefined, undefined, undefined, undefined, "Ninguno", undefined, "Ambos", undefined);
+  tareaActual: Tarea = new Tarea(undefined, undefined, undefined, undefined, undefined, undefined, "Ninguno", undefined, "Ambos", undefined, undefined);
   notificar: boolean;
-  hoy: String = new Date().toISOString();
+  repetirHasta: string = new Date().toISOString();
   periodosActuales: TareaPeriodo[] = [];
   periodoAct = { inicio: startOfDay(new Date()).toISOString(), final: startOfDay(new Date()).toISOString(), antNotif: 10 };
   periodoAuto = { inicio: "", final: "" };
-  tareaAutomatica: TareaAutomatica = new TareaAutomatica(undefined, "", "", undefined, new Date(), new Date(), "", undefined, undefined, 10);
+  tareaAutomatica: TareaAutomatica = new TareaAutomatica(undefined, "", "", undefined, new Date(), new Date(), "", undefined, undefined, 10, "minutos");
   tareaAutomaticaPer = "horas";
   restDias = ['L', 'K', 'M', 'J', 'V', 'S', 'D'];
   configAuto = false;
@@ -328,9 +328,9 @@ export class CalendarioTareasComponent {
   }
 
   ngAfterViewInit() {
-    console.log("ESTA LA 0??");
+    console.log(this.tareas_periodos[0].fecha_hora_inicio_original);
+    console.log(this.tareas_periodos[0].fecha_hora_inicio_original.toISOString());
     this.tabs.selectedIndex = 0;
-
   }
 
   getTareasPendientes() {
@@ -399,6 +399,7 @@ export class CalendarioTareasComponent {
     let maxId = 0;
     for (let tarea of this.tareas) if (tarea.id_tarea > maxId) maxId = tarea.id_tarea;
     this.tareaActual.id_tarea = maxId + 1;
+    this.tareaActual.repetir_hasta = isoStringToDate(this.repetirHasta);
     this.tareaActual.id_usuario = this.actualUser.id_usuario;
     this.tareas.push(this.tareaActual);
     // meter en BD

@@ -62,7 +62,7 @@
               <div class="btn btn-cool" (click)="abrirPendientes()" *ngIf="tareasSinProcesar != 0"
                 style="position: relative;width: 42px;top:1px;right: 1px;overflow: visible!important;">
                 <ion-badge id="notifications-badge" color="danger"
-                  style="background-color: #c81912;position: absolute;top: -3px;right: -3px;border-radius: 100%;">
+                  style="background-color: #ce0f3d;position: absolute;top: -3px;right: -3px;border-radius: 100%;">
                   {{tareasSinProcesar}}
                 </ion-badge>
                 <ion-icon name="file-tray-full-outline">
@@ -245,7 +245,7 @@
 
               <ion-item *ngIf="tareaActual.repeticion != 'Ninguno'">
                 <ion-label position="floating">Repetir hasta</ion-label>
-                <ion-datetime min="2000" max="2100" [(ngModel)]="hoy" done-text="Listo" cancel-text="Cancelar"
+                <ion-datetime min="2000" max="2100" [(ngModel)]="repetirHasta" done-text="Listo" cancel-text="Cancelar"
                   dayShortNames="Domingo,Lunes,Martes,Miércoles,Jueves,Viernes,Sábado" displayFormat="DDD DD MMM YYYY"
                   name="hasta" monthShortNames="Ene, Feb, Mar, Abr, May, Jun, Jul, Ago, Sep, Oct, Nov, Dec">
                 </ion-datetime>
@@ -420,10 +420,10 @@
                     <ion-input required type="number" name="durEst" [(ngModel)]="tareaAutomatica.duracion_estimada">
                     </ion-input>
                     <ion-select position="fixes" okText="Aceptar" cancelText="Cancelar" name="perAuto"
-                      [(ngModel)]="tareaAutomaticaPer">
+                      [(ngModel)]="tareaAutomatica.duracion_estimada_medida">
                       <ion-select-option value="minutos">Minutos</ion-select-option>
                       <ion-select-option value="horas">Horas</ion-select-option>
-                      <ion-select-option value="días">Días</ion-select-option>
+                      <ion-select-option value="dias">Días</ion-select-option>
                     </ion-select>
                   </ion-item>
 
