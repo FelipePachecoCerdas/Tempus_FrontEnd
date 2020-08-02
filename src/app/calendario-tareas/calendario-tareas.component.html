@@ -1,0 +1,606 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title> Calendario de Tareas </ion-title>
+  </ion-toolbar>
+
+</ion-header>
+
+
+
+<!--
+-->
+
+<ion-content>
+
+  <mat-tab-group #tabs [selectedIndex]="cero">
+    <mat-tab label="Calendario">
+      <div style="  padding-top: 15px;padding-right: 10px;padding-left: 10px;">
+
+        <ion-grid *ngIf="platform.platforms().includes('tablet')">
+          <ion-row class="ion-align-items-center">
+            <ion-col></ion-col>
+            <ion-col>
+              <div class="btn-group">
+                <div class="btn btn-cool" mwlCalendarPreviousView [view]="view" [(viewDate)]="viewDate"
+                  (viewDateChange)="closeOpenMonthViewDay()">
+                  <ion-icon name="caret-back-outline"></ion-icon>
+                </div>
+                <div class="btn btn-cool-2" mwlCalendarToday [(viewDate)]="viewDate">
+                  Hoy
+                </div>
+                <div class="btn btn-cool" mwlCalendarNextView [view]="view" [(viewDate)]="viewDate"
+                  (viewDateChange)="closeOpenMonthViewDay()">
+                  <ion-icon name="caret-forward-outline"></ion-icon>
+                </div>
+
+              </div>
+            </ion-col>
+            <ion-col>
+              <h3 style="display:inline-block;">{{ viewDate | calendarDate:(view + 'ViewTitle'):'es' }}</h3>
+            </ion-col>
+            <ion-col>
+              <div class="btn-group">
+                <div class="btn btn-cool" (click)="setView(CalendarView.Month)"
+                  [class.active]="view === CalendarView.Month">
+                  Mes
+                </div>
+                <div class="btn btn-cool" (click)="setView(CalendarView.Week)"
+                  [class.active]="view === CalendarView.Week">
+                  Semana
+                </div>
+                <div class="btn btn-cool" (click)="setView(CalendarView.Day)"
+                  [class.active]="view === CalendarView.Day">
+                  Día
+                </div>
+              </div>
+            </ion-col>
+            <ion-col>
+
+              <div class="btn btn-cool" (click)="abrirPendientes()" *ngIf="tareasSinProcesar != 0"
+                style="position: relative;width: 42px;top:1px;right: 1px;overflow: visible!important;">
+                <ion-badge id="notifications-badge" color="danger"
+                  style="background-color: #c81912;position: absolute;top: -3px;right: -3px;border-radius: 100%;">
+                  {{tareasSinProcesar}}
+                </ion-badge>
+                <ion-icon name="file-tray-full-outline">
+                </ion-icon>
+              </div>
+
+
+
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+
+        <ion-grid *ngIf="!platform.platforms().includes('tablet')">
+          <ion-row class="ion-align-items-center" style="text-align: center;">
+            <ion-col>
+              <div class="btn-group">
+                <div class="btn btn-cool" mwlCalendarPreviousView [view]="view" [(viewDate)]="viewDate"
+                  (viewDateChange)="closeOpenMonthViewDay()">
+                  <ion-icon name="caret-back-outline"></ion-icon>
+                </div>
+                <div class="btn btn-cool-2" mwlCalendarToday [(viewDate)]="viewDate">
+                  Hoy
+                </div>
+                <div class="btn btn-cool" mwlCalendarNextView [view]="view" [(viewDate)]="viewDate"
+                  (viewDateChange)="closeOpenMonthViewDay()">
+                  <ion-icon name="caret-forward-outline"></ion-icon>
+                </div>
+
+              </div>
+            </ion-col>
+          </ion-row>
+
+          <ion-row class="ion-align-items-center" style="text-align: center;">
+            <ion-col>
+              <h3 style="display:inline-block;">
+                {{ viewDate | calendarDate:(view + 'ViewTitle'):'es' }}</h3>
+              &nbsp;&nbsp;&nbsp;
+              <div class="btn btn-cool" (click)="abrirPendientes()" *ngIf="tareasSinProcesar != 0"
+                style="position: relative;width: 42px;right: 1px;overflow: visible!important;">
+                <ion-badge id="notifications-badge" color="danger"
+                  style="background-color: #c81912;position: absolute;top: -3px;right: -3px;border-radius: 100%;">
+                  {{tareasSinProcesar}}
+                </ion-badge>
+                <ion-icon name="file-tray-full-outline">
+                </ion-icon>
+              </div>
+
+            </ion-col>
+          </ion-row>
+
+          <ion-row class="ion-align-items-center" style="text-align: center;">
+            <ion-col>
+              <div class="btn-group">
+                <div class="btn btn-cool" (click)="setView(CalendarView.Month)"
+                  [class.active]="view === CalendarView.Month">
+                  Mes
+                </div>
+                <div class="btn btn-cool" (click)="setView(CalendarView.Week)"
+                  [class.active]="view === CalendarView.Week">
+                  Semana
+                </div>
+                <div class="btn btn-cool" (click)="setView(CalendarView.Day)"
+                  [class.active]="view === CalendarView.Day">
+                  Día
+                </div>
+              </div>
+            </ion-col>
+          </ion-row>
+
+        </ion-grid>
+
+
+        <br />
+        <div [ngSwitch]="view">
+          <mwl-calendar-month-view locale="es" *ngSwitchCase="CalendarView.Month" [viewDate]="viewDate"
+            [events]="events" [refresh]="refresh" [activeDayIsOpen]="activeDayIsOpen"
+            (dayClicked)="dayClicked($event.day)" (eventClicked)="handleEvent('Clicked', $event.event)"
+            (eventTimesChanged)="eventTimesChanged($event)">
+          </mwl-calendar-month-view>
+          <mwl-calendar-week-view style="color: white !important;" locale="es" *ngSwitchCase="CalendarView.Week"
+            [viewDate]="viewDate" [events]="events" [refresh]="refresh"
+            (eventClicked)="handleEvent('Clicked', $event.event)" (eventTimesChanged)="eventTimesChanged($event)">
+          </mwl-calendar-week-view>
+          <mwl-calendar-day-view style="color: white !important;" locale="es" *ngSwitchCase="CalendarView.Day"
+            [viewDate]="viewDate" [events]="events" [refresh]="refresh"
+            (eventClicked)="handleEvent('Clicked', $event.event)" (eventTimesChanged)="eventTimesChanged($event)">
+          </mwl-calendar-day-view>
+        </div>
+
+        <br />
+
+        <ng-template #modalContent let-close="close">
+          <div class="modal-header">
+            <h5 class="modal-title">Event action occurred</h5>
+            <button type="button" class="close" (click)="close()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div>
+              Action:
+              <pre>{{ modalData?.action }}</pre>
+            </div>
+            <div>
+              Event:
+              <pre>{{ modalData?.event | json }}</pre>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" (click)="close()">
+              OK
+            </button>
+          </div>
+        </ng-template>
+
+
+        <ng-template #listaPendientesModal let-close="close">
+          <div class="modal-header dark-theme" style="background-color: #1a1a1a !important;">
+            <ion-label class="modal-title">Tareas Automáticas sin Programar</ion-label>
+            <ion-button icon-only shape="round" (click)="close()">
+              <ion-icon icon-only name="close-circle-outline"></ion-icon>
+            </ion-button>
+          </div>
+          <div class="modal-body dark-theme" style="background-color: #1a1a1a !important;">
+
+            <div>
+              <ion-list *ngFor="let tarea of tareasPendientes; index as i" style="background-color: transparent;">
+                <ion-card>
+                  <ion-card-content>
+                    <ion-label> Tarea No.{{i+1}}: {{tarea.nombre_tarea}} </ion-label>
+                  </ion-card-content>
+                </ion-card>
+              </ion-list>
+            </div>
+
+          </div>
+          <div class="modal-footer dark-theme" style="background-color: #1a1a1a !important;">
+
+            <div style=" text-align: center">
+              <ion-button shape="round" (click)=" programarTareas()">Programar Tareas
+              </ion-button>
+            </div>
+
+          </div>
+        </ng-template>
+
+
+
+      </div>
+    </mat-tab>
+    <mat-tab label="Nueva Tarea">
+
+      <div>
+
+
+        <form>
+          <ion-card>
+            <ion-list lines="full" class="ion-no-margin ion-no-padding">
+              <ion-item>
+                <ion-label position="floating">Título <ion-text color="danger">*</ion-text>
+                </ion-label>
+                <ion-input required type="text" name="nombre_tarea" [(ngModel)]="tareaActual.nombre_tarea"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="floating">Descripción </ion-label>
+                <ion-textarea name="descripcion_tarea" [(ngModel)]="tareaActual.descripcion_tarea"></ion-textarea>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="floating">Intervalo de Repetición</ion-label>
+                <ion-select okText="Aceptar" cancelText="Cancelar" name="tareaActual.repeticion"
+                  [(ngModel)]="tareaActual.repeticion">
+                  <ion-select-option value="Ninguno">Ninguno</ion-select-option>
+                  <ion-select-option value="Diariamente">Diariamente</ion-select-option>
+                  <ion-select-option value="Semanalmente">Semanalmente</ion-select-option>
+                  <ion-select-option value="Mensualmente">Mensualmente</ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <ion-item *ngIf="tareaActual.repeticion != 'Ninguno'">
+                <ion-label position="floating">Repetir hasta</ion-label>
+                <ion-datetime min="2000" max="2100" [(ngModel)]="hoy" done-text="Listo" cancel-text="Cancelar"
+                  dayShortNames="Domingo,Lunes,Martes,Miércoles,Jueves,Viernes,Sábado" displayFormat="DDD DD MMM YYYY"
+                  name="hasta" monthShortNames="Ene, Feb, Mar, Abr, May, Jun, Jul, Ago, Sep, Oct, Nov, Dec">
+                </ion-datetime>
+
+              </ion-item>
+
+              <ion-item>
+                <ion-label>Notificar</ion-label>
+                <ion-toggle name="notificar_" [(ngModel)]="notificar"></ion-toggle>
+              </ion-item>
+
+              <ion-item *ngIf="notificar">
+                <ion-label position="floating">Modo de Notificación</ion-label>
+                <ion-select okText="Aceptar" cancelText="Cancelar" name="modo_notificar"
+                  [(ngModel)]="tareaActual.modo_notificar">
+                  <ion-select-option value="Correo electronico">Correo Electrónico</ion-select-option>
+                  <ion-select-option value="Celular">Móvil</ion-select-option>
+                  <ion-select-option value="Ambos">Ambos</ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="floating">Modo de Programación</ion-label>
+                <ion-select okText="Aceptar" cancelText="Cancelar" name="modo_tarea_"
+                  [(ngModel)]="tareaActual.modo_tarea">
+                  <ion-select-option value="Automatico">Automático</ion-select-option>
+                  <ion-select-option value="Manual">Manual</ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <ion-card *ngIf="tareaActual.modo_tarea == 'Manual'">
+                <ion-card-header>
+                  <ion-label>Nuevo Periodo</ion-label>
+                </ion-card-header>
+
+                <ion-card-content>
+                  <ion-item>
+                    <ion-label position="floating">Fecha de inicio</ion-label>
+                    <ion-datetime min="2000" max="2100" [(ngModel)]="periodoAct.inicio" done-text="Listo"
+                      cancel-text="Cancelar" dayShortNames="Domingo,Lunes,Martes,Miércoles,Jueves,Viernes,Sábado"
+                      displayFormat="DDD DD MMM YYYY" name="hasta"
+                      monthShortNames="Ene, Feb, Mar, Abr, May, Jun, Jul, Ago, Sep, Oct, Nov, Dec">
+                    </ion-datetime>
+                  </ion-item>
+
+                  <ion-item>
+                    <ion-label position="floating">Hora de inicio</ion-label>
+                    <ion-datetime displayFormat="h:mm a" [(ngModel)]="periodoAct.inicio" done-text="Listo" name="desdeT"
+                      cancel-text="Cancelar"></ion-datetime>
+                  </ion-item>
+
+                  <ion-item>
+                    <ion-label position="floating">Fecha de finalización</ion-label>
+                    <ion-datetime min="2000" max="2100" [(ngModel)]="periodoAct.final" done-text="Listo"
+                      cancel-text="Cancelar" dayShortNames="Domingo,Lunes,Martes,Miércoles,Jueves,Viernes,Sábado"
+                      displayFormat="DDD DD MMM YYYY" name="hasta"
+                      monthShortNames="Ene, Feb, Mar, Abr, May, Jun, Jul, Ago, Sep, Oct, Nov, Dec">
+                    </ion-datetime>
+                  </ion-item>
+
+                  <ion-item>
+                    <ion-label position="floating">Hora de finalización</ion-label>
+                    <ion-datetime displayFormat="h:mm a" [(ngModel)]="periodoAct.final" done-text="Listo" name="hastaT"
+                      cancel-text="Cancelar"></ion-datetime>
+                  </ion-item>
+
+                  <ion-item *ngIf="notificar">
+                    <ion-icon shape="circle" name="notifications-circle-outline"></ion-icon>
+                    <ion-input required type="number" name="antNotif" [(ngModel)]="periodoAct.antNotif">
+                    </ion-input>
+                    <ion-label position="fixed"> minutos antes </ion-label>
+                  </ion-item>
+
+
+                  <ion-button shape="round" (click)="agregarPeriodo()">
+                    <ion-icon shape="circle" name="add-outline"></ion-icon>
+                    <ion-label> Agregar </ion-label>
+                  </ion-button>
+
+                </ion-card-content>
+              </ion-card>
+
+              <div *ngIf="tareaActual.modo_tarea == 'Manual'">
+                <ion-list *ngFor="let periodo of periodosActuales; index as i">
+                  <ion-card>
+                    <ion-card-header>
+                      <ion-item>
+                        <ion-label> Periodo No.{{i+1}} </ion-label>
+                        <ion-button shape="round" (click)="borrarPeriodo(i)">
+                          <ion-icon shape="circle" slot="icon-only" name="trash-outline"></ion-icon>
+                        </ion-button>
+                      </ion-item>
+                    </ion-card-header>
+
+                    <ion-card-content>
+                      <ion-label style="text-transform: capitalize;">
+                        Desde: {{periodo.fecha_hora_inicio_original | date:'EEEE d - MMMM, y' }}
+                      </ion-label>
+                      <br />
+                      <ion-label>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        {{periodo.fecha_hora_inicio_original | date:'hh:mm a' }}
+                      </ion-label>
+                      <br />
+                      <ion-label style="text-transform: capitalize;">
+                        Hasta: &nbsp;{{periodo.fecha_hora_final_original | date:'EEEE d - MMMM, y' }}
+                      </ion-label>
+                      <br />
+                      <ion-label>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        {{periodo.fecha_hora_final_original | date:'hh:mm a' }}
+                      </ion-label>
+                      <br />
+                      <ion-label *ngIf="notificar">
+                        <ion-icon shape="circle" name="notifications-circle-outline"></ion-icon>
+                        {{periodo.antelacion_notificacion}} minutos antes
+                      </ion-label>
+
+                    </ion-card-content>
+
+
+
+                  </ion-card>
+
+
+                </ion-list>
+              </div>
+              <ion-card *ngIf="tareaActual.modo_tarea == 'Manual' && periodosActuales.length == 0">
+                <ion-item>
+                  <ion-label> Sin periodos
+                  </ion-label>
+                </ion-item>
+              </ion-card>
+
+
+
+              <ion-card *ngIf="tareaActual.modo_tarea == 'Automatico'">
+                <ion-card-header>
+                  <ion-label>Modo Automático</ion-label>
+                </ion-card-header>
+
+                <ion-card-content>
+
+
+                  <ion-item>
+                    <ion-label position="floating">Nivel de Dificultad</ion-label>
+                    <ion-select okText="Aceptar" cancelText="Cancelar" name="nivel_dificultad"
+                      [(ngModel)]="tareaAutomatica.nivel_dificultad">
+                      <ion-select-option value="Muy alto">Muy difícil</ion-select-option>
+                      <ion-select-option value="Alto">Díficil</ion-select-option>
+                      <ion-select-option value="Medio">Normal</ion-select-option>
+                      <ion-select-option value="Bajo">Fácil</ion-select-option>
+                      <ion-select-option value="Muy bajo">Muy fácil</ion-select-option>
+                    </ion-select>
+                  </ion-item>
+
+                  <ion-item>
+                    <ion-label position="floating">Nivel de Prioridad</ion-label>
+                    <ion-select okText="Aceptar" cancelText="Cancelar" name="nivel_prioridad"
+                      [(ngModel)]="tareaAutomatica.nivel_prioridad">
+                      <ion-select-option value="Muy alto">Muy importante</ion-select-option>
+                      <ion-select-option value="Alto">Importante</ion-select-option>
+                      <ion-select-option value="Medio">Normal</ion-select-option>
+                      <ion-select-option value="Bajo">Baja relevancia</ion-select-option>
+                      <ion-select-option value="Muy bajo">De poca relevancia</ion-select-option>
+                    </ion-select>
+                  </ion-item>
+
+                  <ion-item>
+                    <ion-icon shape="circle" name="hourglass-outline">
+                    </ion-icon>
+                    <ion-input required type="number" name="durEst" [(ngModel)]="tareaAutomatica.duracion_estimada">
+                    </ion-input>
+                    <ion-select position="fixes" okText="Aceptar" cancelText="Cancelar" name="perAuto"
+                      [(ngModel)]="tareaAutomaticaPer">
+                      <ion-select-option value="minutos">Minutos</ion-select-option>
+                      <ion-select-option value="horas">Horas</ion-select-option>
+                      <ion-select-option value="días">Días</ion-select-option>
+                    </ion-select>
+                  </ion-item>
+
+                  <ion-item *ngIf="notificar">
+                    <ion-icon shape="circle" name="notifications-circle-outline"></ion-icon>
+                    <ion-input required type="number" name="antNotifAuto"
+                      [(ngModel)]="tareaAutomatica.antelacion_notificacion">
+                    </ion-input>
+                    <ion-label position="fixed"> minutos antes </ion-label>
+                  </ion-item>
+
+                  <ion-item button (click)="cambiarConfigAuto()" *ngIf="!configAuto">
+                    <ion-label color="primary">Mostrar más opciones</ion-label>
+                  </ion-item>
+
+                  <div *ngIf="configAuto">
+                    <ion-item>
+                      <ion-label position="floating">Restricción de Inicio</ion-label>
+                      <ion-datetime min="2000" max="2100" [(ngModel)]="periodoAuto.inicio" done-text="Listo"
+                        cancel-text="Cancelar" dayShortNames="Domingo,Lunes,Martes,Miércoles,Jueves,Viernes,Sábado"
+                        displayFormat="DDD DD MMM YYYY" name="hasta"
+                        monthShortNames="Ene, Feb, Mar, Abr, May, Jun, Jul, Ago, Sep, Oct, Nov, Dec">
+                      </ion-datetime>
+                    </ion-item>
+
+                    <ion-item>
+                      <ion-label position="floating">Restricción de Finalización</ion-label>
+                      <ion-datetime min="2000" max="2100" [(ngModel)]="periodoAuto.final" done-text="Listo"
+                        cancel-text="Cancelar" dayShortNames="Domingo,Lunes,Martes,Miércoles,Jueves,Viernes,Sábado"
+                        displayFormat="DDD DD MMM YYYY" name="hasta"
+                        monthShortNames="Ene, Feb, Mar, Abr, May, Jun, Jul, Ago, Sep, Oct, Nov, Dec">
+                      </ion-datetime>
+                    </ion-item>
+
+                    <ion-item>
+                      <ion-label position="floating">Días Válidos</ion-label>
+                      <ion-select okText="Aceptar" cancelText="Cancelar" name="nivel_dificultad" multiple="true"
+                        [(ngModel)]="restDias">
+                        <ion-select-option value="L">Lunes</ion-select-option>
+                        <ion-select-option value="K">Martes</ion-select-option>
+                        <ion-select-option value="M">Miércoles</ion-select-option>
+                        <ion-select-option value="J">Jueves</ion-select-option>
+                        <ion-select-option value="V">Viernes</ion-select-option>
+                        <ion-select-option value="S">Sábado</ion-select-option>
+                        <ion-select-option value="D">Domingo</ion-select-option>
+                      </ion-select>
+                    </ion-item>
+
+
+                    <ion-item>
+                      <ion-label position="floating">Horas Máximas por Día
+                      </ion-label>
+                      <ion-select okText="Aceptar" cancelText="Cancelar" name="max_horas_dia"
+                        [(ngModel)]="tareaAutomatica.max_horas_dia">
+                        <ion-select-option *ngFor="let hora of horas">{{hora}}</ion-select-option>
+                      </ion-select>
+                    </ion-item>
+
+                    <ion-item>
+                      <ion-label position="floating">Horas Mínimas por Día
+                      </ion-label>
+                      <ion-select okText="Aceptar" cancelText="Cancelar" name="min_horas_dia"
+                        [(ngModel)]="tareaAutomatica.min_horas_dia">
+                        <ion-select-option *ngFor="let hora of horas">{{hora}}</ion-select-option>
+                      </ion-select>
+                    </ion-item>
+
+                    <ion-item button (click)="cambiarConfigAuto()">
+                      <ion-label color="primary">Mostrar menos opciones</ion-label>
+                    </ion-item>
+                  </div>
+
+                </ion-card-content>
+              </ion-card>
+
+
+              <!--
+            <ion-item>
+              <ion-label position="stacked">Last Name <ion-text color="danger">*</ion-text>
+              </ion-label>
+              <ion-input required type="text" oninput="handleLastNameValue(event)"></ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="floating">Title</ion-label>
+              <ion-input></ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Address</ion-label>
+              <ion-input placeholder="Address Line 1"></ion-input>
+              <ion-input placeholder="Address Line 2"></ion-input>
+              <ion-input placeholder="City"></ion-input>
+              <ion-input placeholder="State"></ion-input>
+              <ion-input placeholder="Zip Code"></ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Notes</ion-label>
+              <ion-textarea></ion-textarea>
+            </ion-item>
+          </ion-list>
+-->
+            </ion-list>
+            <div class="ion-padding" style=" text-align: center">
+              <ion-button shape="round" (click)=" registrarTarea(4)">Registrar Tarea
+              </ion-button>
+            </div>
+          </ion-card>
+        </form>
+
+
+
+      </div>
+
+    </mat-tab>
+    <mat-tab label="Third  T"> Content 3 </mat-tab>
+  </mat-tab-group>
+</ion-content>
+
+
+
+
+<!--
+<ion-tabs>
+
+  <ion-tab tab="music">
+    <ion-header translucent>
+      <ion-toolbar>
+        <ion-title>Music</ion-title>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content fullscreen class="ion-padding">
+      <h1>Musi1c</h1>
+    </ion-content>
+  </ion-tab>
+
+  <ion-tab tab="movies">
+    <ion-header translucent>
+      <ion-toolbar>
+        <ion-title>Movies</ion-title>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content fullscreen class="ion-padding">
+      <h1>Movies</h1>
+    </ion-content>
+  </ion-tab>
+
+  <ion-tab tab="games">
+    <ion-header translucent>
+      <ion-toolbar>
+        <ion-title>Games</ion-title>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content fullscreen class="ion-padding">
+      <h1>Games</h1>
+    </ion-content>
+  </ion-tab>
+
+  <ion-tab-bar slot="bottom">
+    <ion-tab-button tab="music">
+      <ion-label>Music</ion-label>
+      <ion-icon name="musical-note"></ion-icon>
+    </ion-tab-button>
+    <ion-tab-button tab="movies">
+      <ion-label>Movies</ion-label>
+      <ion-icon name="videocam"></ion-icon>
+    </ion-tab-button>
+    <ion-tab-button tab="games">
+      <ion-label>Games</ion-label>
+      <ion-icon name="game-controller"></ion-icon>
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-tabs>
+
+
+-->

@@ -1,0 +1,13 @@
+@import 'https://fonts.googleapis.com/icon?family=Material+Icons';
+
+.example-flex-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  h3 {
+    text-transform: capitalize;
+}
+.calendar{font-size: 12px !important}
+.calendar .card {color: white !important}

@@ -1,11 +1,17 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { CalendarioTareasComponent } from './calendario-tareas/calendario-tareas.component';
+
 
 const routes: Routes = [
   {
     path: '',
     redirectTo: 'folder/Inbox',
     pathMatch: 'full'
+  },
+  {
+    path: 'calendario-tareas',
+    loadChildren: () => import('./calendario-tareas/calendario-tareas.module').then( m => m.CalendarioTareasModule )
   },
   {
     path: 'folder/:id',
@@ -15,7 +21,7 @@ const routes: Routes = [
 
 @NgModule({
   imports: [
-    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })
+    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules }),
   ],
   exports: [RouterModule]
 })

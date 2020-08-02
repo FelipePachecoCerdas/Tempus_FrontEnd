@@ -1,51 +1,54 @@
+
 import { Component, OnInit } from '@angular/core';
 
 import { Platform } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 
+import { MenuController } from '@ionic/angular';
+
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss']
 })
+
 export class AppComponent implements OnInit {
   public selectedIndex = 0;
+
+
   public appPages = [
     {
-      title: 'Inbox',
-      url: '/folder/Inbox',
-      icon: 'mail'
+      title: 'Mis Tareas',
+      url: '/calendario-tareas',
+      icon: 'calendar'
     },
     {
-      title: 'Outbox',
+      title: 'Mis Proyectos',
       url: '/folder/Outbox',
-      icon: 'paper-plane'
+      icon: 'briefcase'
     },
     {
-      title: 'Favorites',
+      title: 'Rendimiento',
       url: '/folder/Favorites',
-      icon: 'heart'
+      icon: 'cellular'
     },
     {
-      title: 'Archived',
+      title: 'Bitácora',
       url: '/folder/Archived',
-      icon: 'archive'
+      icon: 'reader'
     },
     {
-      title: 'Trash',
+      title: 'Perfil',
       url: '/folder/Trash',
-      icon: 'trash'
+      icon: 'person'
     },
-    {
-      title: 'Spam',
-      url: '/folder/Spam',
-      icon: 'warning'
-    }
+
   ];
-  public labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
+  public labels = ['Family'];
 
   constructor(
+    private menu: MenuController,
     private platform: Platform,
     private splashScreen: SplashScreen,
     private statusBar: StatusBar
@@ -66,4 +69,5 @@ export class AppComponent implements OnInit {
       this.selectedIndex = this.appPages.findIndex(page => page.title.toLowerCase() === path.toLowerCase());
     }
   }
+
 }
