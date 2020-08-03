@@ -86,6 +86,7 @@ import { TareaAutomatica } from '../tempus-models/tarea_automatica';
 import { Usuario } from '../tempus-models/usuario';
 import { CalendarEventActionsComponent } from 'angular-calendar/modules/common/calendar-event-actions.component';
 import { ToastController, Platform, ModalController } from '@ionic/angular';
+import { UsuarioService } from 'src/app/services/usuario.service';
 
 registerLocaleData(localeEs);
 
@@ -345,9 +346,13 @@ export class CalendarioTareasComponent {
   constructor(private modal: NgbModal, @Inject(DOCUMENT) private document,
     public toastController: ToastController,
     public platform: Platform,
-    public modalCtrl: ModalController) {
+    public modalCtrl: ModalController,
+    public usuarioService: UsuarioService) {
     this.crearEventos();
     this.calcularTareasSinProcesar();
+    this.usuarioService.findAll().subscribe(res => {
+      console.log(res);
+    });
   }
 
   private readonly darkThemeClass = 'dark-theme';
@@ -366,6 +371,7 @@ export class CalendarioTareasComponent {
     console.log(this.tareas_periodos[0].fecha_hora_inicio_original);
     console.log(this.tareas_periodos[0].fecha_hora_inicio_original.toISOString());
     this.tabs.selectedIndex = 0;
+
   }
 
   getTareasPendientes() {
@@ -400,6 +406,7 @@ export class CalendarioTareasComponent {
 
   cambiarConfigAuto() {
     this.configAuto = !this.configAuto;
+
   }
 
   async programarTareas() {
