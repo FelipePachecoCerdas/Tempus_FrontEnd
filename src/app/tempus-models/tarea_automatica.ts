@@ -12,5 +12,5 @@ export class TareaAutomatica {
         public antelacion_notificacion: number,
         public duracion_estimada_medida: string,
     ) { }
-
-}
+}//ALTER TABLE public.tarea_automatica
+//ADD COLUMN duracion_estimada_medida character varying(100) NOT NULL;

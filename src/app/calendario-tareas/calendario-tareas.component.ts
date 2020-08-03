@@ -180,6 +180,41 @@ function isoStringToDate(isoString: string) {
   return returnDate;
 }
 
+function deepCopy(obj) {
+  var copy;
+
+  // Handle the 3 simple types, and null or undefined
+  if (null == obj || "object" != typeof obj) return obj;
+
+  // Handle Date
+  if (obj instanceof Date) {
+    copy = new Date();
+    copy.setTime(obj.getTime());
+    return copy;
+  }
+
+  // Handle Array
+  if (obj instanceof Array) {
+    copy = [];
+    for (var i = 0, len = obj.length; i < len; i++) {
+      copy[i] = deepCopy(obj[i]);
+    }
+    return copy;
+  }
+
+  // Handle Object
+  if (obj instanceof Object) {
+    copy = {};
+    for (var attr in obj) {
+      if (obj.hasOwnProperty(attr)) copy[attr] = deepCopy(obj[attr]);
+    }
+    return copy;
+  }
+
+  throw new Error("Unable to copy obj! Its type isn't supported.");
+}
+
+
 export class CustomDateFormatter extends CalendarDateFormatter {
   // you can override any of the methods defined in the parent class
 
@@ -401,13 +436,14 @@ export class CalendarioTareasComponent {
     this.tareaActual.id_tarea = maxId + 1;
     this.tareaActual.repetir_hasta = isoStringToDate(this.repetirHasta);
     this.tareaActual.id_usuario = this.actualUser.id_usuario;
-    this.tareas.push(this.tareaActual);
+    this.tareas.push(deepCopy(this.tareaActual) as Tarea);
+
     // meter en BD
 
     if (this.tareaActual.modo_tarea == "Manual") {
       for (let periodo of this.periodosActuales) {
         periodo.id_tarea = maxId + 1;
-        this.tareas_periodos.push(periodo);
+        this.tareas_periodos.push(deepCopy(periodo) as TareaPeriodo);
         // meter en BD
       }
       this.events = [];
@@ -422,7 +458,7 @@ export class CalendarioTareasComponent {
       if (this.tareaAutomaticaPer == "dias") this.tareaAutomatica.duracion_estimada *= (60 * 24);
       // guarda los minutos 
 
-      this.tareas_automaticas.push(this.tareaAutomatica);
+      this.tareas_automaticas.push(deepCopy(this.tareaAutomatica) as TareaAutomatica);
       // meter en BD
       this.calcularTareasSinProcesar();
     }
