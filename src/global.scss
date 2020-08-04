@@ -154,7 +154,7 @@ $theme-colors: (
 }
 
 .btn-cool-2 {
-  @include button-variant(map-get($theme-colors, "whi"), map-get($theme-colors, "secondary"), map-get($theme-colors, "primary"));
+  @include button-variant(map-get($theme-colors, "whi"), map-get($theme-colors, "secondary"), map-get($theme-colors, "secondary"));
 }
 
 
@@ -182,3 +182,5 @@ ion-button {
   }
 
 }
+
+

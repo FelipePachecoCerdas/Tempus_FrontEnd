@@ -10,10 +10,7 @@
 
 
 
-<!--
--->
-
-<ion-content>
+<ion-content data-backdrop="false">
 
   <mat-tab-group #tabs [selectedIndex]="cero">
     <mat-tab label="Calendario">
@@ -209,6 +206,331 @@
           </div>
         </ng-template>
 
+        <ng-template #updateTareaModal let-close="close">
+
+          <div class="modal-header dark-theme" style="background-color: #1a1a1a !important;">
+            <ion-label class="modal-title">Modificar Tarea</ion-label>
+            <ion-button icon-only shape="round" (click)="close()">
+              <ion-icon icon-only name="close-circle-outline"></ion-icon>
+            </ion-button>
+          </div>
+          <div class="modal-body dark-theme" style="background-color: #1a1a1a !important;">
+
+            <div>
+              <form>
+                <ion-card>
+                  <ion-list lines="full" class="ion-no-margin ion-no-padding">
+                    <ion-item>
+                      <ion-label position="floating">Título <ion-text color="danger">*</ion-text>
+                      </ion-label>
+                      <ion-input required type="text" name="nombre_tarea" [(ngModel)]="tareaActual.nombre_tarea">
+                      </ion-input>
+                    </ion-item>
+
+                    <ion-item>
+                      <ion-label position="floating">Descripción </ion-label>
+                      <ion-textarea name="descripcion_tarea" [(ngModel)]="tareaActual.descripcion_tarea"></ion-textarea>
+                    </ion-item>
+
+
+                    <ion-item class="alertWTF">
+                      <ion-label position="floating">Intervalo de Repetición</ion-label>
+                      <ion-select class="alertWTF" okText="Aceptar" cancelText="Cancelar"
+                        (ionFocus)="updateUpdateModal()" name="tareaActual.repeticion"
+                        [(ngModel)]="tareaActual.repeticion">
+                        <ion-select-option value="ninguno">Ninguno</ion-select-option>
+                        <ion-select-option value="diariamente">Diariamente</ion-select-option>
+                        <ion-select-option value="semanalmente">Semanalmente</ion-select-option>
+                        <ion-select-option value="mensualmente">Mensualmente</ion-select-option>
+                      </ion-select>
+                    </ion-item>
+
+                    <ion-item *ngIf="tareaActual.repeticion != 'ninguno'">
+                      <ion-label position="floating">Repetir hasta</ion-label>
+                      <ion-datetime min="2000" max="2100" [(ngModel)]="repetirHasta" done-text="Listo"
+                        cancel-text="Cancelar" dayShortNames="Domingo,Lunes,Martes,Miércoles,Jueves,Viernes,Sábado"
+                        displayFormat="DDD DD MMM YYYY" name="hasta"
+                        monthShortNames="Ene, Feb, Mar, Abr, May, Jun, Jul, Ago, Sep, Oct, Nov, Dec">
+                      </ion-datetime>
+
+                    </ion-item>
+
+                    <ion-item>
+                      <ion-label>Notificar</ion-label>
+                      <ion-toggle name="notificar_" [(ngModel)]="notificar"></ion-toggle>
+                    </ion-item>
+
+                    <ion-item *ngIf="notificar">
+                      <ion-label position="floating">Modo de Notificación</ion-label>
+                      <ion-select okText="Aceptar" cancelText="Cancelar" name="modo_notificar"
+                        [(ngModel)]="tareaActual.modo_notificar">
+                        <ion-select-option value="correo electronico">Correo Electrónico</ion-select-option>
+                        <ion-select-option value="celular">Móvil</ion-select-option>
+                        <ion-select-option value="ambos">Ambos</ion-select-option>
+                      </ion-select>
+                    </ion-item>
+
+                    <ion-item>
+                      <ion-label position="floating">Modo de Programación</ion-label>
+                      <ion-select okText="Aceptar" cancelText="Cancelar" name="modo_tarea_"
+                        [(ngModel)]="tareaActual.modo_tarea">
+                        <ion-select-option value="automatico">Automático</ion-select-option>
+                        <ion-select-option value="manual">Manual</ion-select-option>
+                      </ion-select>
+                    </ion-item>
+
+                    <ion-card *ngIf="tareaActual.modo_tarea == 'manual'">
+                      <ion-card-header>
+                        <ion-label>Nuevo Periodo</ion-label>
+                      </ion-card-header>
+
+                      <ion-card-content>
+                        <ion-item>
+                          <ion-label position="floating">Fecha de inicio</ion-label>
+                          <ion-datetime min="2000" max="2100" [(ngModel)]="periodoAct.inicio" done-text="Listo"
+                            cancel-text="Cancelar" dayShortNames="Domingo,Lunes,Martes,Miércoles,Jueves,Viernes,Sábado"
+                            displayFormat="DDD DD MMM YYYY" name="hasta"
+                            monthShortNames="Ene, Feb, Mar, Abr, May, Jun, Jul, Ago, Sep, Oct, Nov, Dec">
+                          </ion-datetime>
+                        </ion-item>
+
+                        <ion-item>
+                          <ion-label position="floating">Hora de inicio</ion-label>
+                          <ion-datetime displayFormat="h:mm a" [(ngModel)]="periodoAct.inicio" done-text="Listo"
+                            name="desdeT" cancel-text="Cancelar"></ion-datetime>
+                        </ion-item>
+
+                        <ion-item>
+                          <ion-label position="floating">Fecha de finalización</ion-label>
+                          <ion-datetime min="2000" max="2100" [(ngModel)]="periodoAct.final" done-text="Listo"
+                            cancel-text="Cancelar" dayShortNames="Domingo,Lunes,Martes,Miércoles,Jueves,Viernes,Sábado"
+                            displayFormat="DDD DD MMM YYYY" name="hasta"
+                            monthShortNames="Ene, Feb, Mar, Abr, May, Jun, Jul, Ago, Sep, Oct, Nov, Dec">
+                          </ion-datetime>
+                        </ion-item>
+
+                        <ion-item>
+                          <ion-label position="floating">Hora de finalización</ion-label>
+                          <ion-datetime displayFormat="h:mm a" [(ngModel)]="periodoAct.final" done-text="Listo"
+                            name="hastaT" cancel-text="Cancelar"></ion-datetime>
+                        </ion-item>
+
+                        <ion-item *ngIf="notificar">
+                          <ion-icon shape="circle" name="notifications-circle-outline"></ion-icon>
+                          <ion-input required type="number" name="antNotif" [(ngModel)]="periodoAct.antNotif">
+                          </ion-input>
+                          <ion-label position="fixed"> minutos antes </ion-label>
+                        </ion-item>
+
+
+                        <ion-button shape="round" (click)="agregarPeriodo()">
+                          <ion-icon shape="circle" name="add-outline"></ion-icon>
+                          <ion-label> Agregar </ion-label>
+                        </ion-button>
+
+                      </ion-card-content>
+                    </ion-card>
+
+                    <div *ngIf="tareaActual.modo_tarea == 'manual'">
+                      <ion-list *ngFor="let periodo of periodosActuales; index as i">
+                        <ion-card>
+                          <ion-card-header>
+                            <ion-item>
+                              <ion-label> Periodo No.{{i+1}} </ion-label>
+                              <ion-button shape="round" (click)="borrarPeriodo(i)">
+                                <ion-icon shape="circle" slot="icon-only" name="trash-outline"></ion-icon>
+                              </ion-button>
+                            </ion-item>
+                          </ion-card-header>
+
+                          <ion-card-content>
+                            <ion-label style="text-transform: capitalize;">
+                              Desde: {{periodo.fecha_hora_inicio_original | date:'EEEE d - MMMM, y' }}
+                            </ion-label>
+                            <br />
+                            <ion-label>
+                              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                              {{periodo.fecha_hora_inicio_original | date:'hh:mm a' }}
+                            </ion-label>
+                            <br />
+                            <ion-label style="text-transform: capitalize;">
+                              Hasta: &nbsp;{{periodo.fecha_hora_final_original | date:'EEEE d - MMMM, y' }}
+                            </ion-label>
+                            <br />
+                            <ion-label>
+                              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                              {{periodo.fecha_hora_final_original | date:'hh:mm a' }}
+                            </ion-label>
+                            <br />
+                            <ion-label *ngIf="notificar">
+                              <ion-icon shape="circle" name="notifications-circle-outline"></ion-icon>
+                              {{periodo.antelacion_notificacion}} minutos antes
+                            </ion-label>
+
+                          </ion-card-content>
+
+
+
+                        </ion-card>
+
+
+                      </ion-list>
+                    </div>
+                    <ion-card *ngIf="tareaActual.modo_tarea == 'manual' && periodosActuales.length == 0">
+                      <ion-item>
+                        <ion-label> Sin periodos
+                        </ion-label>
+                      </ion-item>
+                    </ion-card>
+
+
+
+                    <ion-card *ngIf="tareaActual.modo_tarea == 'automatico'">
+                      <ion-card-header>
+                        <ion-label>Modo Automático</ion-label>
+                      </ion-card-header>
+
+                      <ion-card-content>
+
+
+                        <ion-item>
+                          <ion-label position="floating">Nivel de Dificultad</ion-label>
+                          <ion-select okText="Aceptar" cancelText="Cancelar" name="nivel_dificultad"
+                            [(ngModel)]="tareaAutomatica.nivel_dificultad">
+                            <ion-select-option value="muy alto">Muy difícil</ion-select-option>
+                            <ion-select-option value="alto">Díficil</ion-select-option>
+                            <ion-select-option value="medio">Normal</ion-select-option>
+                            <ion-select-option value="bajo">Fácil</ion-select-option>
+                            <ion-select-option value="muy bajo">Muy fácil</ion-select-option>
+                          </ion-select>
+                        </ion-item>
+
+                        <ion-item>
+                          <ion-label position="floating">Nivel de Prioridad</ion-label>
+                          <ion-select okText="Aceptar" cancelText="Cancelar" name="nivel_prioridad"
+                            [(ngModel)]="tareaAutomatica.nivel_prioridad">
+                            <ion-select-option value="muy alto">Muy importante</ion-select-option>
+                            <ion-select-option value="alto">Importante</ion-select-option>
+                            <ion-select-option value="medio">Normal</ion-select-option>
+                            <ion-select-option value="bajo">Baja relevancia</ion-select-option>
+                            <ion-select-option value="muy bajo">De poca relevancia</ion-select-option>
+                          </ion-select>
+                        </ion-item>
+
+                        <ion-item>
+                          <ion-icon shape="circle" name="hourglass-outline">
+                          </ion-icon>
+                          <ion-input required type="number" name="durEst"
+                            [(ngModel)]="tareaAutomatica.duracion_estimada">
+                          </ion-input>
+                          <ion-select position="fixes" okText="Aceptar" cancelText="Cancelar" name="perAuto"
+                            [(ngModel)]="tareaAutomatica.duracion_estimada_medida">
+                            <ion-select-option value="minutos">Minutos</ion-select-option>
+                            <ion-select-option value="horas">Horas</ion-select-option>
+                            <ion-select-option value="dias">Días</ion-select-option>
+                          </ion-select>
+                        </ion-item>
+
+                        <ion-item *ngIf="notificar">
+                          <ion-icon shape="circle" name="notifications-circle-outline"></ion-icon>
+                          <ion-input required type="number" name="antNotifAuto"
+                            [(ngModel)]="tareaAutomatica.antelacion_notificacion">
+                          </ion-input>
+                          <ion-label position="fixed"> minutos antes </ion-label>
+                        </ion-item>
+
+                        <ion-item button (click)="cambiarConfigAuto()" *ngIf="!configAuto">
+                          <ion-label color="primary">Mostrar más opciones</ion-label>
+                        </ion-item>
+
+                        <div *ngIf="configAuto">
+                          <ion-item>
+                            <ion-label position="floating">Restricción de Inicio</ion-label>
+                            <ion-datetime min="2000" max="2100" [(ngModel)]="periodoAuto.inicio" done-text="Listo"
+                              cancel-text="Cancelar"
+                              dayShortNames="Domingo,Lunes,Martes,Miércoles,Jueves,Viernes,Sábado"
+                              displayFormat="DDD DD MMM YYYY" name="hasta"
+                              monthShortNames="Ene, Feb, Mar, Abr, May, Jun, Jul, Ago, Sep, Oct, Nov, Dec">
+                            </ion-datetime>
+                          </ion-item>
+
+                          <ion-item>
+                            <ion-label position="floating">Restricción de Finalización</ion-label>
+                            <ion-datetime min="2000" max="2100" [(ngModel)]="periodoAuto.final" done-text="Listo"
+                              cancel-text="Cancelar"
+                              dayShortNames="Domingo,Lunes,Martes,Miércoles,Jueves,Viernes,Sábado"
+                              displayFormat="DDD DD MMM YYYY" name="hasta"
+                              monthShortNames="Ene, Feb, Mar, Abr, May, Jun, Jul, Ago, Sep, Oct, Nov, Dec">
+                            </ion-datetime>
+                          </ion-item>
+
+                          <ion-item>
+                            <ion-label position="floating">Días Válidos</ion-label>
+                            <ion-select okText="Aceptar" cancelText="Cancelar" name="nivel_dificultad" multiple="true"
+                              [(ngModel)]="restDias">
+                              <ion-select-option value="L">Lunes</ion-select-option>
+                              <ion-select-option value="K">Martes</ion-select-option>
+                              <ion-select-option value="M">Miércoles</ion-select-option>
+                              <ion-select-option value="J">Jueves</ion-select-option>
+                              <ion-select-option value="V">Viernes</ion-select-option>
+                              <ion-select-option value="S">Sábado</ion-select-option>
+                              <ion-select-option value="D">Domingo</ion-select-option>
+                            </ion-select>
+                          </ion-item>
+
+
+                          <ion-item>
+                            <ion-label position="floating">Horas Máximas por Día
+                            </ion-label>
+                            <ion-select okText="Aceptar" cancelText="Cancelar" name="max_horas_dia"
+                              [(ngModel)]="tareaAutomatica.max_horas_dia">
+                              <ion-select-option *ngFor="let hora of horas">{{hora}}</ion-select-option>
+                            </ion-select>
+                          </ion-item>
+
+                          <ion-item>
+                            <ion-label position="floating">Horas Mínimas por Día
+                            </ion-label>
+                            <ion-select okText="Aceptar" cancelText="Cancelar" name="min_horas_dia"
+                              [(ngModel)]="tareaAutomatica.min_horas_dia">
+                              <ion-select-option *ngFor="let hora of horas">{{hora}}</ion-select-option>
+                            </ion-select>
+                          </ion-item>
+
+                          <ion-item button (click)="cambiarConfigAuto()">
+                            <ion-label color="primary">Mostrar menos opciones</ion-label>
+                          </ion-item>
+                        </div>
+
+                      </ion-card-content>
+                    </ion-card>
+
+                  </ion-list>
+                  <div class="ion-padding" style=" text-align: center">
+                    <ion-button shape="round" (click)=" registrarTarea(4)">Registrar Tarea
+                    </ion-button>
+                  </div>
+                </ion-card>
+              </form>
+
+
+
+            </div>
+
+
+          </div>
+          <div class="modal-footer dark-theme" style="background-color: #1a1a1a !important;">
+
+            <div style=" text-align: center">
+              <ion-button shape="round" (click)=" programarTareas()">Programar Tareas
+              </ion-button>
+            </div>
+
+          </div>
+
+
+        </ng-template>
+
 
 
       </div>
@@ -236,14 +558,14 @@
                 <ion-label position="floating">Intervalo de Repetición</ion-label>
                 <ion-select okText="Aceptar" cancelText="Cancelar" name="tareaActual.repeticion"
                   [(ngModel)]="tareaActual.repeticion">
-                  <ion-select-option value="Ninguno">Ninguno</ion-select-option>
-                  <ion-select-option value="Diariamente">Diariamente</ion-select-option>
-                  <ion-select-option value="Semanalmente">Semanalmente</ion-select-option>
-                  <ion-select-option value="Mensualmente">Mensualmente</ion-select-option>
+                  <ion-select-option value="ninguno">Ninguno</ion-select-option>
+                  <ion-select-option value="diariamente">Diariamente</ion-select-option>
+                  <ion-select-option value="semanalmente">Semanalmente</ion-select-option>
+                  <ion-select-option value="mensualmente">Mensualmente</ion-select-option>
                 </ion-select>
               </ion-item>
 
-              <ion-item *ngIf="tareaActual.repeticion != 'Ninguno'">
+              <ion-item *ngIf="tareaActual.repeticion != 'ninguno'">
                 <ion-label position="floating">Repetir hasta</ion-label>
                 <ion-datetime min="2000" max="2100" [(ngModel)]="repetirHasta" done-text="Listo" cancel-text="Cancelar"
                   dayShortNames="Domingo,Lunes,Martes,Miércoles,Jueves,Viernes,Sábado" displayFormat="DDD DD MMM YYYY"
@@ -261,9 +583,9 @@
                 <ion-label position="floating">Modo de Notificación</ion-label>
                 <ion-select okText="Aceptar" cancelText="Cancelar" name="modo_notificar"
                   [(ngModel)]="tareaActual.modo_notificar">
-                  <ion-select-option value="Correo electronico">Correo Electrónico</ion-select-option>
-                  <ion-select-option value="Celular">Móvil</ion-select-option>
-                  <ion-select-option value="Ambos">Ambos</ion-select-option>
+                  <ion-select-option value="correo electronico">Correo Electrónico</ion-select-option>
+                  <ion-select-option value="celular">Móvil</ion-select-option>
+                  <ion-select-option value="ambos">Ambos</ion-select-option>
                 </ion-select>
               </ion-item>
 
@@ -271,12 +593,12 @@
                 <ion-label position="floating">Modo de Programación</ion-label>
                 <ion-select okText="Aceptar" cancelText="Cancelar" name="modo_tarea_"
                   [(ngModel)]="tareaActual.modo_tarea">
-                  <ion-select-option value="Automatico">Automático</ion-select-option>
-                  <ion-select-option value="Manual">Manual</ion-select-option>
+                  <ion-select-option value="automatico">Automático</ion-select-option>
+                  <ion-select-option value="manual">Manual</ion-select-option>
                 </ion-select>
               </ion-item>
 
-              <ion-card *ngIf="tareaActual.modo_tarea == 'Manual'">
+              <ion-card *ngIf="tareaActual.modo_tarea == 'manual'">
                 <ion-card-header>
                   <ion-label>Nuevo Periodo</ion-label>
                 </ion-card-header>
@@ -328,7 +650,7 @@
                 </ion-card-content>
               </ion-card>
 
-              <div *ngIf="tareaActual.modo_tarea == 'Manual'">
+              <div *ngIf="tareaActual.modo_tarea == 'manual'">
                 <ion-list *ngFor="let periodo of periodosActuales; index as i">
                   <ion-card>
                     <ion-card-header>
@@ -373,7 +695,7 @@
 
                 </ion-list>
               </div>
-              <ion-card *ngIf="tareaActual.modo_tarea == 'Manual' && periodosActuales.length == 0">
+              <ion-card *ngIf="tareaActual.modo_tarea == 'manual' && periodosActuales.length == 0">
                 <ion-item>
                   <ion-label> Sin periodos
                   </ion-label>
@@ -382,7 +704,7 @@
 
 
 
-              <ion-card *ngIf="tareaActual.modo_tarea == 'Automatico'">
+              <ion-card *ngIf="tareaActual.modo_tarea == 'automatico'">
                 <ion-card-header>
                   <ion-label>Modo Automático</ion-label>
                 </ion-card-header>
@@ -394,11 +716,11 @@
                     <ion-label position="floating">Nivel de Dificultad</ion-label>
                     <ion-select okText="Aceptar" cancelText="Cancelar" name="nivel_dificultad"
                       [(ngModel)]="tareaAutomatica.nivel_dificultad">
-                      <ion-select-option value="Muy alto">Muy difícil</ion-select-option>
-                      <ion-select-option value="Alto">Díficil</ion-select-option>
-                      <ion-select-option value="Medio">Normal</ion-select-option>
-                      <ion-select-option value="Bajo">Fácil</ion-select-option>
-                      <ion-select-option value="Muy bajo">Muy fácil</ion-select-option>
+                      <ion-select-option value="muy alto">Muy difícil</ion-select-option>
+                      <ion-select-option value="alto">Díficil</ion-select-option>
+                      <ion-select-option value="medio">Normal</ion-select-option>
+                      <ion-select-option value="bajo">Fácil</ion-select-option>
+                      <ion-select-option value="muy bajo">Muy fácil</ion-select-option>
                     </ion-select>
                   </ion-item>
 
@@ -406,11 +728,11 @@
                     <ion-label position="floating">Nivel de Prioridad</ion-label>
                     <ion-select okText="Aceptar" cancelText="Cancelar" name="nivel_prioridad"
                       [(ngModel)]="tareaAutomatica.nivel_prioridad">
-                      <ion-select-option value="Muy alto">Muy importante</ion-select-option>
-                      <ion-select-option value="Alto">Importante</ion-select-option>
-                      <ion-select-option value="Medio">Normal</ion-select-option>
-                      <ion-select-option value="Bajo">Baja relevancia</ion-select-option>
-                      <ion-select-option value="Muy bajo">De poca relevancia</ion-select-option>
+                      <ion-select-option value="muy alto">Muy importante</ion-select-option>
+                      <ion-select-option value="alto">Importante</ion-select-option>
+                      <ion-select-option value="medio">Normal</ion-select-option>
+                      <ion-select-option value="bajo">Baja relevancia</ion-select-option>
+                      <ion-select-option value="muy bajo">De poca relevancia</ion-select-option>
                     </ion-select>
                   </ion-item>
 
