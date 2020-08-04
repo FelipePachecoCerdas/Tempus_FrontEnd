@@ -1,0 +1,35 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="inicio"> </ion-back-button>
+    </ion-buttons>
+    <ion-title>Inicio de sesión</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding class="background">
+  <ion-card class="tarjeta">
+  <form  [formGroup]="loginForm" class="contenido">
+    <ion-title class="title" color="primary">Inicio de Sesión</ion-title>
+    <ion-item lines="full">
+      <ion-label position="floating">Email</ion-label>
+      <ion-input formControlName="email" type="text"  required></ion-input>
+    </ion-item>
+    <ion-row></ion-row>
+
+    <ion-item  >
+      <ion-label position="floating">Contraseña</ion-label>
+      <ion-input  formControlName="contrasenna" [type]="showPassword ? 'text' : 'password'"  required></ion-input>
+      <ion-icon  style="align-self: center;" slot="icon-only" slot="end" [name]="passwordToggleIcon" (click)="togglePassword()"></ion-icon>
+    </ion-item>
+
+    <ion-row>
+      <ion-col>
+        <ion-button [disabled]="!loginForm.valid" (click)="onSubmitLogin(loginForm.value)" color="danger" expand="block">Iniciar sesión</ion-button>
+        <a [routerLink]="['/forgot-password']" class="small-text">¿Olvidó su contraseña?</a>
+      </ion-col>
+    </ion-row>
+
+  </form>
+</ion-card>
+</ion-content>

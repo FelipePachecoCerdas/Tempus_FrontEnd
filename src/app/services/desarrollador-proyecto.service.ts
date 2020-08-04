@@ -42,6 +42,10 @@ export class DesarrolladorProyectoService {
   findByProjectId(id_proyecto) {
     return this.https.get(`${baseUrl}/id_proyecto/${id_proyecto}`);
   }
+
+  findByDeveloperId(id_desarrollador) {
+    return this.https.get(`${baseUrl}/id_desarrollador/${id_desarrollador}`);
+  }
   
   query(consulta){
     return this.https.post(`${baseUrl}/consulta`,consulta);

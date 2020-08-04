@@ -38,6 +38,10 @@ export class UsuarioService {
     return this.https.get(`${baseUrl}/nombre/${nombre}`);
   }
 
+  findByEmail(correo_electronico){
+    return this.https.get(`${baseUrl}/correo_electronico/${correo_electronico}`)
+  }
+
   query(consulta){
     return this.https.post(`${baseUrl}/consulta`,consulta);
   }

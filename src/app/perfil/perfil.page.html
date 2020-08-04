@@ -1,0 +1,181 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title> Información de Perfil </ion-title>
+  </ion-toolbar>
+
+</ion-header>
+
+
+<!--
+-->
+
+<ion-content>
+
+  <mat-tab-group #tabs [selectedIndex]="cero">
+    <mat-tab label="Cuenta">
+      <div>
+      <ion-card class="tarjeta">
+        <form [formGroup]="RegisterForm" class="contenido">
+          <ion-title class="title" color="primary">Información Personal</ion-title>
+          <ion-item lines="full">
+            <ion-label position="floating">Nombre</ion-label>
+            <ion-input formControlName="nombre" type="text" required></ion-input>
+          </ion-item>
+      
+          <ion-item lines="full">
+            <ion-label position="floating">Apellidos</ion-label>
+            <ion-input formControlName="apellidos" type="text" required></ion-input>
+          </ion-item>
+    
+          <ion-item lines="full">
+            <ion-label position="floating">Descripción personal</ion-label>
+            <ion-textarea formControlName="descripcion_personal" type="text" ></ion-textarea>
+          </ion-item>
+    
+          <ion-item lines="full">
+            <ion-label position="floating">Compañia</ion-label>
+            <ion-input formControlName="compannia" type="text" ></ion-input>
+          </ion-item>
+      
+          <ion-item lines="full">
+            <ion-label position="floating">Correo electrónico</ion-label>
+            <ion-input formControlName="correo_electronico" type="email" required></ion-input>
+          </ion-item>
+      
+          <ion-item  >
+            <ion-label position="floating">Contraseña</ion-label>
+            <ion-input  formControlName="contrasenna" [type]="showPassword ? 'text' : 'password'"  required></ion-input>
+            <ion-icon  style="align-self: center;" slot="icon-only" slot="end" [name]="passwordToggleIcon" (click)="togglePassword()"></ion-icon>
+          </ion-item>
+      
+          <ion-row>
+            <ion-col>
+              <ion-button [disabled]="!RegisterForm.valid" type="submit" color="danger" (click)="onSubmitRegister(RegisterForm.value)" expand="block">Guardar</ion-button>
+            </ion-col>
+          </ion-row>
+        </form>
+      </ion-card>
+    </div>
+    </mat-tab>
+     <mat-tab label="Proyectos"> 
+       <div>
+         <ion-card *ngIf="proyectos_admi&&proyectos_admi.length > 0" class="tarjeta">
+          <ion-list class="contenido">
+          <ion-title style="font-weight: bold;" class="title"  color="primary">Administrador</ion-title>
+          <ion-list *ngFor="let i of proyectos_admi">
+            <ion-item>
+              <ion-label > {{i.nombre_proyecto}}</ion-label>
+              <div></div>
+              <ion-text></ion-text>
+              <ion-icon color="primary" id="{{i.id_proyecto}}" style="align-self: center;"slot="end" name="close-circle-outline" (click)="alertaAdministrador(i.id_proyecto)"></ion-icon>
+            </ion-item>
+          </ion-list>
+        </ion-list>
+         </ion-card>
+         <ion-card *ngIf="proyectos_interesado&&proyectos_interesado.length > 0" class="tarjeta">
+          <ion-list class="contenido">
+          <ion-title style="font-weight: bold;" class="title"  color="primary">Interesado</ion-title>
+          <ion-list *ngFor="let i of proyectos_interesado">
+            <ion-item>
+              <ion-label > {{i.nombre_proyecto}}</ion-label>
+              <div></div>
+              <ion-text></ion-text>
+              <ion-icon color="primary" id="{{i.id_proyecto}}" style="align-self: center;"slot="end" name="close-circle-outline" (click)="alertaInteresado(i.id_proyecto)"></ion-icon>
+            </ion-item>
+          </ion-list>
+        </ion-list>
+         </ion-card>
+         <ion-card *ngIf="proyectos_desarrollador&&proyectos_desarrollador.length > 0" class="tarjeta">
+          
+          <ion-list class="contenido">
+          <ion-title style="font-weight: bold;" class="title"  color="primary">Desarrollador</ion-title>
+          <ion-list *ngFor="let i of proyectos_desarrollador">
+            <ion-item>
+            <ion-list>
+                  <ion-label style="opacity: 100;"> {{i.nombre_proyecto}}</ion-label>
+
+                  <ion-label style="opacity: 100;"  position="stacked">Descripción del proyecto</ion-label>
+                  <ion-input color="dark" disabled="true">{{i.descripcion_proyecto}}</ion-input>
+                  <ion-label style="opacity: 100;"  position="stacked">Administrador del proyecto</ion-label>
+                  <ion-input color="dark" disabled="true"></ion-input>
+              </ion-list>
+              <ion-icon color="primary" id="{{i.id_proyecto}}" style="align-self: center;"slot="end" name="close-circle-outline" (click)="alertaDesarrollador(i.id_proyecto)"></ion-icon>
+            </ion-item>
+          </ion-list>
+        </ion-list>
+         </ion-card>
+         <ion-card class="contenido"
+         *ngIf="(!proyectos_desarrollador||proyectos_desarrollador.length == 0)&&(!proyectos_interesado||proyectos_interesado.length == 0)&&(!proyectos_admi||proyectos_admi.length == 0)">
+         
+         <ion-text color="dark">
+                      Actualmente no se encuentra involucrado en ningún proyecto
+         </ion-text>
+        </ion-card>
+       </div>
+     </mat-tab>
+  </mat-tab-group>
+</ion-content>
+
+
+
+
+<!--
+<ion-tabs>
+
+  <ion-tab tab="music">
+    <ion-header translucent>
+      <ion-toolbar>
+        <ion-title>Music</ion-title>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content fullscreen class="ion-padding">
+      <h1>Musi1c</h1>
+    </ion-content>
+  </ion-tab>
+
+  <ion-tab tab="movies">
+    <ion-header translucent>
+      <ion-toolbar>
+        <ion-title>Movies</ion-title>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content fullscreen class="ion-padding">
+      <h1>Movies</h1>
+    </ion-content>
+  </ion-tab>
+
+  <ion-tab tab="games">
+    <ion-header translucent>
+      <ion-toolbar>
+        <ion-title>Games</ion-title>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content fullscreen class="ion-padding">
+      <h1>Games</h1>
+    </ion-content>
+  </ion-tab>
+
+  <ion-tab-bar slot="bottom">
+    <ion-tab-button tab="music">
+      <ion-label>Music</ion-label>
+      <ion-icon name="musical-note"></ion-icon>
+    </ion-tab-button>
+    <ion-tab-button tab="movies">
+      <ion-label>Movies</ion-label>
+      <ion-icon name="videocam"></ion-icon>
+    </ion-tab-button>
+    <ion-tab-button tab="games">
+      <ion-label>Games</ion-label>
+      <ion-icon name="game-controller"></ion-icon>
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-tabs>
+
+
+-->

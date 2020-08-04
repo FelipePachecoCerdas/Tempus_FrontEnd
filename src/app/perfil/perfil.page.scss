@@ -1,0 +1,59 @@
+@media (min-width: 700px){
+    .tarjeta {
+        width: 600px; 
+       
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .title{
+        text-align: center;
+        font-weight: bold;
+        font-size: 2em;
+    
+    }
+}
+
+@media (max-width: 699px){
+    .tarjeta {
+        
+
+        margin-left:calc(5vW);
+        margin-right: calc(5vW);   
+    }
+    .title{
+        text-align: center;
+        font-weight: bold;
+        font-size: 6vw;
+    
+    }
+}
+
+labels {  
+    color:var(--ion-color-primary)
+}
+
+.image{
+    display: block;
+    margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 2em;
+    width: 5em;
+    height: 5em;
+}
+
+
+.inicio{
+    margin-left: 1em;
+    margin-right: 1em;
+    margin-bottom: 2em;
+}
+ion-content.background {
+
+    --background: url(https://www.wallpapertip.com/wmimgs/81-811796_full-hd-simple-background.jpg) 0 0/100% 100% no-repeat;
+
+}
+
+.contenido{
+    padding:2em
+}

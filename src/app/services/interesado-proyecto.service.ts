@@ -43,6 +43,10 @@ export class InteresadoProyectoService {
     return this.https.get(`${baseUrl}/id_proyecto/${id_proyecto}`);
   }
 
+  findByStakeholderId(id_interesado) {
+    return this.https.get(`${baseUrl}/id_interesado/${id_interesado}`);
+  }
+
   query(consulta){
     return this.https.post(`${baseUrl}/consulta`,consulta);
   }

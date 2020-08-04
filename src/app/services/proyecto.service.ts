@@ -37,6 +37,9 @@ export class ProyectoService {
     return this.https.get(`${baseUrl}/nombre_proyecto/${nombre_proyecto}`);
   }
   
+  findByProjectAdministratorId(administrador_proyecto) {
+    return this.https.get(`${baseUrl}/administrador_proyecto/${administrador_proyecto}`);
+  }
 
   query(consulta){
     return this.https.post(`${baseUrl}/consulta`,consulta);
