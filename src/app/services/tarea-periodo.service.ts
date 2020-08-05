@@ -36,7 +36,7 @@ export class TareaPeriodoService {
   }
 
   findByTaskId(id_tarea) {
-    return this.https.delete(`${baseUrl}/id_tarea/${id_tarea}`);
+    return this.https.get(`${baseUrl}/id_tarea/${id_tarea}`);
   }
 
   query(consulta) {

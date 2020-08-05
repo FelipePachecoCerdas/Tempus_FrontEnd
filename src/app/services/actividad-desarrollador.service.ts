@@ -38,6 +38,10 @@ export class ActividadDesarrolladorService {
     return this.https.get(`${baseUrl}/id_proyecto/${id_proyecto}`);
   }
 
+  async findByProjectUserId(id_proyecto,id_desarrollador) {
+    return this.https.get(`${baseUrl}/id_proyecto/${id_proyecto}/id_desarrollador/${id_desarrollador}`);
+  }
+
   query(consulta){
     return this.https.post(`${baseUrl}/consulta`,consulta);
   }

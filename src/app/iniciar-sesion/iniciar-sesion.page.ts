@@ -50,13 +50,16 @@ export class IniciarSesionPage implements OnInit {
           res =>{
             this.appComponent.user= this.authService.actualUser;
             this.router.navigate(['/calendario-tareas'])
+
     
         })
+        this.appComponent.selectedIndex=0
+        this.appComponent.cuentaActual="Estudiante"
+        this.authService.menuIndex(0)
         
     }else{
       this.presentAlert()
     }
-    console.log(this.authService.actualUser)
     /*this.authService.login(formValue.email,formValue.password).then(
       res =>{
         this.appComponent.user.name = this.authService.actualUser.first_name + " " + this.authService.actualUser.last_name;

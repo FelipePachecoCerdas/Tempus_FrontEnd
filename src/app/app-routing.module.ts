@@ -32,6 +32,14 @@ const routes: Routes = [
     path: 'perfil',
     loadChildren: () => import('./perfil/perfil.module').then( m => m.PerfilPageModule)
   },
+  {
+    path: 'bitacora',
+    loadChildren: () => import('./bitacora/bitacora.module').then( m => m.BitacoraPageModule)
+  },
+  {
+    path: 'rendimiento',
+    loadChildren: () => import('./rendimiento/rendimiento.module').then( m => m.RendimientoPageModule)
+  },
 
 
 

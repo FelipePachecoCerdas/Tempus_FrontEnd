@@ -62,7 +62,7 @@ export class RegistroPage implements OnInit {
       cssClass: 'alerta',
       header: 'Cuenta registrada',
       subHeader: '',
-      message: 'La cuenta ha sido registrada éxitosamente',
+      message: 'La cuenta ha sido registrada exitosamente',
       buttons: [{text:'Aceptar',
       handler:()=>{
         this.router.navigate(['/iniciar-sesion']);
@@ -75,7 +75,6 @@ export class RegistroPage implements OnInit {
   async onSubmitRegister(formValue){
     
     let verify:any
-    console.log(formValue.correo_electronico)
     await(await this.usuarioService.findByEmail(formValue.correo_electronico)).toPromise().then(
       data=>{
         verify=data
@@ -89,11 +88,9 @@ export class RegistroPage implements OnInit {
       
         }
       )
-      console.log(usuarios[(usuarios.length)-1].id_usuario)
       let usuario=new Usuario(usuarios[(usuarios.length)-1].id_usuario+1,formValue.nombre ,formValue.apellidos ,formValue.contrasenna 
                               ,formValue.correo_electronico, null,formValue.descripcion_personal ,formValue.compannia , null)
       this.usuarioService.create(usuario).subscribe()
-      console.log(usuario)
       this.alertaRegistro();
     }else{
       this.presentAlert()

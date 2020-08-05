@@ -206,7 +206,7 @@
           </div>
         </ng-template>
 
-        <ng-template #updateTareaModal let-close="close">
+        <ng-template class="siSirve"   #updateTareaModal let-close="close">
 
           <div class="modal-header dark-theme" style="background-color: #1a1a1a !important;">
             <ion-label class="modal-title">Modificar Tarea</ion-label>
@@ -232,10 +232,10 @@
                       <ion-textarea name="descripcion_tarea" [(ngModel)]="tareaActual.descripcion_tarea"></ion-textarea>
                     </ion-item>
 
-
-                    <ion-item class="alertWTF">
+                    
+                    <ion-item >
                       <ion-label position="floating">Intervalo de Repetición</ion-label>
-                      <ion-select class="alertWTF" okText="Aceptar" cancelText="Cancelar"
+                      <ion-select class="miClase" okText="Aceptar" cancelText="Cancelar"
                         (ionFocus)="updateUpdateModal()" name="tareaActual.repeticion"
                         [(ngModel)]="tareaActual.repeticion">
                         <ion-select-option value="ninguno">Ninguno</ion-select-option>

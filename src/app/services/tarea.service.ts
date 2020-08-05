@@ -39,6 +39,14 @@ export class TareaService {
     return this.https.get(`${baseUrl}/nombre_tarea/${nombre_tarea}`);
   }
 
+  findByUserId(id_usuario) {
+    return this.https.get(`${baseUrl}/id_usuario/${id_usuario}`);
+  }
+
+  findByUserActivityId(id_usuario,id_actividad) {
+    return this.https.get(`${baseUrl}/id_usuario/${id_usuario}/id_actividad/${id_actividad}`);
+  }
+
   query(consulta){
     return this.https.post(`${baseUrl}/consulta`,consulta);
   }

@@ -10,12 +10,17 @@ export class AuthService {
 
   private sesion = window.localStorage;
   loggedIn:boolean = false;
+  public selectedIndex=0;
 
   constructor(private usuarioService: UsuarioService) { 
     let user = JSON.parse( this.sesion.getItem("user") ) as Usuario
+    let selectedIndex =JSON.parse(this.sesion.getItem("selectedIndex")) as number
+    let cuentaActual =this.sesion.getItem("cuentaActual")
     if(user){
       this.loggedIn = true
       this.actualUser = user;
+      this.selectedIndex =selectedIndex
+      this.cuentaActual=cuentaActual
     } 
   }
   public cuentaActual='Estudiante';
@@ -35,13 +40,22 @@ export class AuthService {
     return new Promise((resolve,rejected)=>{
 
       this.actualUser = usuario;
+      
       this.sesion.setItem("user",JSON.stringify(usuario));
+      this.sesion.setItem("cuentaActual","Estudiante")
       if (Object.keys(usuario).length === 0){
         rejected(null);
       };
       resolve(usuario);
   })
 
+  }
+  menuIndex(index){
+    this.sesion.setItem("selectedIndex",JSON.stringify(index));
+  }
+
+  currentAccount(cuenta){
+    this.sesion.setItem("cuentaActual",cuenta)
   }
 }
 

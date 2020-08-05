@@ -73,14 +73,16 @@ export class PerfilPage implements OnInit {
 
     await alert.present();
   }
-  async administradorProyecto(administrador_proyecto){
+  async administradorProyecto(proyectos){
     let ap:any
-    await (await this.usuarioService.findByPk(administrador_proyecto)).toPromise().then(
+    for (let proyecto of proyectos){
+    await (await this.usuarioService.findByPk(proyecto.administrador_proyecto)).toPromise().then(
       data=>{
-        ap=data
+        ap=data["nombre"]
       }
     )
-    return ap.nombre
+    proyecto.ap=ap
+    }
   }
   async alertaDesarrollador(id_proyecto) {
     const alert = await this.alertController.create({
@@ -114,8 +116,6 @@ export class PerfilPage implements OnInit {
     this.proyectos_admi=await this.getProyectosAdministrador()
     this.proyectos_interesado= await this.getProyectosInteresado()
     this.proyectos_desarrollador = await this.getProyectosDesarrollador()
-    console.log(this.proyectos_interesado)
-    console.log(await this.administradorProyecto(1));
   }
 
   async getProyectosAdministrador(){
@@ -125,6 +125,7 @@ export class PerfilPage implements OnInit {
         proyectos=data
       }
     )
+    await this.administradorProyecto(proyectos)
     return proyectos
   }
 
@@ -142,7 +143,8 @@ export class PerfilPage implements OnInit {
           proyectos_2.push(data)
         })
     }
-    return proyectos_2
+    await this.administradorProyecto(proyectos_2)
+    return proyectos_2 
   }
 
   async getProyectosDesarrollador(){
@@ -159,7 +161,8 @@ export class PerfilPage implements OnInit {
           proyectos_2.push(data)
         })
     }
-    return proyectos_2
+    this.administradorProyecto(proyectos_2)
+    return await proyectos_2
   }
 
   async presentAlert() {
@@ -188,7 +191,6 @@ export class PerfilPage implements OnInit {
   async onSubmitRegister(formValue){
     
     let verify:any
-    console.log(formValue.correo_electronico)
     await(await this.usuarioService.findByEmail(formValue.correo_electronico)).toPromise().then(
       data=>{
         verify=data
@@ -206,7 +208,7 @@ export class PerfilPage implements OnInit {
                               ,formValue.correo_electronico, null,formValue.descripcion_personal ,formValue.compannia , null)
 
       this.usuarioService.update(usuario.id_usuario,usuario).toPromise()
-      console.log(usuario)
+
       this.authService.login(usuario).then(
         res =>{
           this.appComponent.user= this.authService.actualUser;

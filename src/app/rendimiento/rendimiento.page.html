@@ -1,0 +1,30 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title> Rendimiento </ion-title>
+  </ion-toolbar>
+
+</ion-header>
+<ion-content>
+  <mat-tab-group #tabs [selectedIndex]="cero">
+    <mat-tab label="Cuenta">
+      <div class="ion-padding">
+        <ion-card >
+          <ion-card-header>
+            Bar Chart
+          </ion-card-header>
+          <ion-card-content >
+            <canvas maintainAspectRatio="true"  class="charts" #barCanvas></canvas>
+          </ion-card-content>
+        </ion-card>
+    </div>
+    </mat-tab>
+    <mat-tab label="Proyectos"> 
+      <div>
+
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</ion-content>

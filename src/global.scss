@@ -183,4 +183,11 @@ ion-button {
 
 }
 
+#updateTareaModal{
+  position: relative;
+}
+ion-alert{
+  position: absolute !important;
 
+  z-index: 100000;
+}

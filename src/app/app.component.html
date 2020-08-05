@@ -40,11 +40,24 @@
         </ion-toolbar>
       </ion-header>
       <ion-list>
-        <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages; let i = index">
-          <ion-item (click)="selectedIndex = i" routerDirection="root" [routerLink]="[p.url]" lines="none"
+        <ion-menu-toggle auto-hide="false" *ngFor="let p of paginasMenu; let i = index">
+          <ion-item (click)="selectedIndex = i; cambiarIndex(i)" routerDirection="root" [routerLink]="[p.url]" lines="none"
             detail="false" [class.selected]="selectedIndex == i">
             <ion-icon slot="start" [ios]="p.icon + '-outline'" [md]="p.icon + '-sharp'"></ion-icon>
             <ion-label>{{ p.title }}</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+        <ion-menu-toggle>
+          <ion-item>
+            <ion-label position="stacked">Cambio de Perfil</ion-label>
+                      <ion-select [value]="cuentaActual" (ionChange)="cambiarCuenta($event)" okText="Aceptar" cancelText="Cancelar">
+                        <ion-select-option value="Estudiante">Estudiante</ion-select-option>
+                        <ion-select-option value="Desarrollador">Desarrollador</ion-select-option>
+                        <ion-select-option value="Administrador">Administrador</ion-select-option>
+                        <ion-select-option value="Interesado">Interesado</ion-select-option>
+                        
+                      </ion-select>
+
           </ion-item>
         </ion-menu-toggle>
       </ion-list>

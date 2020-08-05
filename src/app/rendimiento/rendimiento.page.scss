@@ -12,6 +12,9 @@
         font-size: 2em;
     
     }
+    .charts{
+        height: 500px;
+    }
 }
 ion-menu-button {
     color: var(--ion-color-primary);
@@ -31,9 +34,6 @@ ion-menu-button {
     }
 }
 
-labels {  
-    color:var(--ion-color-primary)
-}
 
 .image{
     display: block;
@@ -51,7 +51,7 @@ labels {
     margin-bottom: 2em;
 }
 
-
 .contenido{
     padding:2em
 }
+

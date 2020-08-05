@@ -36,7 +36,7 @@
           </ion-item>
     
           <ion-item lines="full">
-            <ion-label position="floating">Compañia</ion-label>
+            <ion-label position="floating">Compañía</ion-label>
             <ion-input formControlName="compannia" type="text" ></ion-input>
           </ion-item>
       
@@ -65,46 +65,55 @@
          <ion-card *ngIf="proyectos_admi&&proyectos_admi.length > 0" class="tarjeta">
           <ion-list class="contenido">
           <ion-title style="font-weight: bold;" class="title"  color="primary">Administrador</ion-title>
-          <ion-list *ngFor="let i of proyectos_admi">
+          <ion-card *ngFor="let i of proyectos_admi">
             <ion-item>
-              <ion-label > {{i.nombre_proyecto}}</ion-label>
-              <div></div>
-              <ion-text></ion-text>
+              <ion-card-title style="font-weight: bold;"   color="tertiary"> {{i.nombre_proyecto}}</ion-card-title>
               <ion-icon color="primary" id="{{i.id_proyecto}}" style="align-self: center;"slot="end" name="close-circle-outline" (click)="alertaAdministrador(i.id_proyecto)"></ion-icon>
             </ion-item>
-          </ion-list>
+              <ion-item>
+                <ion-label style="opacity: 100;"  position="stacked">Descripción del proyecto</ion-label>
+                <ion-input color="dark" disabled="true">{{i.descripcion_proyecto}}</ion-input>
+                <ion-label style="opacity: 100;"  position="stacked">Administrador del proyecto</ion-label>
+                <ion-input color="dark" disabled="true">{{i.ap}}</ion-input>
+              </ion-item>
+          </ion-card>
         </ion-list>
          </ion-card>
          <ion-card *ngIf="proyectos_interesado&&proyectos_interesado.length > 0" class="tarjeta">
           <ion-list class="contenido">
           <ion-title style="font-weight: bold;" class="title"  color="primary">Interesado</ion-title>
-          <ion-list *ngFor="let i of proyectos_interesado">
+
+            <ion-card  *ngFor="let i of proyectos_interesado" > 
+             
             <ion-item>
-              <ion-label > {{i.nombre_proyecto}}</ion-label>
-              <div></div>
-              <ion-text></ion-text>
+              <ion-card-title style="font-weight: bold;"   color="tertiary"> {{i.nombre_proyecto}}</ion-card-title>
               <ion-icon color="primary" id="{{i.id_proyecto}}" style="align-self: center;"slot="end" name="close-circle-outline" (click)="alertaInteresado(i.id_proyecto)"></ion-icon>
             </ion-item>
-          </ion-list>
+              <ion-item>
+                <ion-label style="opacity: 100;"  position="stacked">Descripción del proyecto</ion-label>
+                <ion-input color="dark" disabled="true">{{i.descripcion_proyecto}}</ion-input>
+                <ion-label style="opacity: 100;"  position="stacked">Administrador del proyecto</ion-label>
+                <ion-input color="dark" disabled="true">{{i.ap}}</ion-input>
+              </ion-item>
+           </ion-card>
         </ion-list>
          </ion-card>
          <ion-card *ngIf="proyectos_desarrollador&&proyectos_desarrollador.length > 0" class="tarjeta">
           
           <ion-list class="contenido">
           <ion-title style="font-weight: bold;" class="title"  color="primary">Desarrollador</ion-title>
-          <ion-list *ngFor="let i of proyectos_desarrollador">
+          <ion-card *ngFor="let i of proyectos_desarrollador">
             <ion-item>
-            <ion-list>
-                  <ion-label style="opacity: 100;"> {{i.nombre_proyecto}}</ion-label>
-
-                  <ion-label style="opacity: 100;"  position="stacked">Descripción del proyecto</ion-label>
-                  <ion-input color="dark" disabled="true">{{i.descripcion_proyecto}}</ion-input>
-                  <ion-label style="opacity: 100;"  position="stacked">Administrador del proyecto</ion-label>
-                  <ion-input color="dark" disabled="true"></ion-input>
-              </ion-list>
+              <ion-card-title style="font-weight: bold;"   color="tertiary"> {{i.nombre_proyecto}}</ion-card-title>
               <ion-icon color="primary" id="{{i.id_proyecto}}" style="align-self: center;"slot="end" name="close-circle-outline" (click)="alertaDesarrollador(i.id_proyecto)"></ion-icon>
             </ion-item>
-          </ion-list>
+              <ion-item>
+                <ion-label style="opacity: 100;"  position="stacked">Descripción del proyecto</ion-label>
+                <ion-input color="dark" disabled="true">{{i.descripcion_proyecto}}</ion-input>
+                <ion-label style="opacity: 100;"  position="stacked">Administrador del proyecto</ion-label>
+                <ion-input color="dark" disabled="true">{{i.ap}}</ion-input>
+              </ion-item>
+          </ion-card>
         </ion-list>
          </ion-card>
          <ion-card class="contenido"
