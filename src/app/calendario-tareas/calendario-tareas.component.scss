@@ -13,3 +13,60 @@
 .calendar .card {color: white !important}
 
 
+@media (min-width: 700px){
+  .tarjeta {
+      width: 750px; 
+     
+      margin-left: auto;
+      margin-right: auto;
+  }
+
+  .tarjeta2 {
+    width: 700px; 
+   
+    margin-left: auto;
+    margin-right: auto;
+}
+
+  .title{
+      text-align: center;
+      font-weight: bold;
+      font-size: 2em;
+  
+  }
+}
+
+@media (max-width: 699px){
+  .tarjeta {
+      
+
+      margin-left:calc(5vW);
+      margin-right: calc(5vW);   
+  }
+
+  .tarjeta2 {
+      
+}
+  .title{
+      text-align: center;
+      font-weight: bold;
+      font-size: 6vw;
+  
+  }
+}
+
+::ng-deep .mat-select-value{    
+  text-align: center;
+  font-weight: bold;
+  color: #6a64ff;
+  font-size: 1.5em;
+}
+
+.colorChachi {
+  
+    text-align: center;
+    font-weight: bold;
+    color: #6a64ff;
+    font-size: 1.5em;
+  
+}

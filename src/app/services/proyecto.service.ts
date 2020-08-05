@@ -8,7 +8,7 @@ const baseUrl = 'http://localhost:8080/api/proyecto';
 })
 export class ProyectoService {
 
-  constructor(private https:HttpClient)  {}
+  constructor(private https: HttpClient) { }
   findAll() {
     return this.https.get(baseUrl);
   }
@@ -36,12 +36,13 @@ export class ProyectoService {
   findByName(nombre_proyecto) {
     return this.https.get(`${baseUrl}/nombre_proyecto/${nombre_proyecto}`);
   }
-  
+
   findByProjectAdministratorId(administrador_proyecto) {
     return this.https.get(`${baseUrl}/administrador_proyecto/${administrador_proyecto}`);
   }
 
-  query(consulta){
-    return this.https.post(`${baseUrl}/consulta`,consulta);
+  query(consulta) {
+    return this.https.post(`${baseUrl}/consulta`, consulta);
   }
 }
+

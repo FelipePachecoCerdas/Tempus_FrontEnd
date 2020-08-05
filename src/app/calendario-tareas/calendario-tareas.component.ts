@@ -61,6 +61,7 @@ import {
   isSameMonth,
   addHours,
   subHours,
+  addMinutes,
 } from 'date-fns';
 import { Subject } from 'rxjs';
 import { NgbModal, NgbModalOptions, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
@@ -93,6 +94,15 @@ import { TareaPeriodoService } from '../services/tarea-periodo.service';
 import { TareaAutomaticaService } from '../services/tarea-automatica.service';
 import { EtiquetaService } from '../services/etiqueta.service';
 import { EtiquetaTareaService } from '../services/etiqueta-tarea.service';
+import { AuthService } from '../services/auth.service';
+import { HorarioEfectivoPorDiaService } from '../services/horario-efectivo-por-dia.service';
+import { PeriodoGeneralService } from '../services/periodo-general.service';
+import { PeriodoEspecificoService } from '../services/periodo-especifico.service';
+import { HorarioEspecificoPorDiaService } from '../services/horario-especifico-por-dia.service';
+import { HorarioEfectivoPorDia } from '../tempus-models/horario_efectivo_por_dia';
+import { HorarioEspecificoPorDia } from '../tempus-models/horario_especifico_por_dia';
+import { PeriodoEspecifico } from '../tempus-models/periodo_especifico';
+import { PeriodoGeneral } from '../tempus-models/periodo_general';
 
 registerLocaleData(localeEs);
 
@@ -134,8 +144,8 @@ function randomColor() {
 function nuevoEvento(idTarea, inicio, final, nombre, color) {
   return {
     id: idTarea,
-    start: inicio,
-    end: final,
+    start: subHours(inicio, 6),
+    end: subHours(final, 6),
     title: nombre,
     color: color,
     actions: actions,
@@ -147,6 +157,7 @@ function nuevoEvento(idTarea, inicio, final, nombre, color) {
     draggable: true,
   }
 }
+
 
 function isoStringToDate(isoString) {
 
@@ -292,11 +303,9 @@ export class CalendarioTareasComponent {
     event: CalendarEvent;
   };
 
-
-
-  usuarios: Usuario[] = [];
   actualUser: Usuario;
-  tareas: Tarea[] = []
+  tareas: Tarea[] = [];
+  colores = [];
   tareas_periodos: TareaPeriodo[] = [];
   tareas_automaticas: TareaAutomatica[] = [];
 
@@ -311,16 +320,16 @@ export class CalendarioTareasComponent {
   restDias = ['L', 'K', 'M', 'J', 'V', 'S', 'D'];
   configAuto = false;
 
-  tareaActual_old: Tarea = new Tarea(undefined, undefined, undefined, undefined, undefined, undefined, "ninguno", undefined, "ambos", undefined, undefined);
-  notificar_old: boolean;
-  repetirHasta_old: string = new Date().toISOString();
-  periodosActuales_old: TareaPeriodo[] = [];
-  periodoAct_old = { inicio: startOfDay(new Date()).toISOString(), final: startOfDay(new Date()).toISOString(), antNotif: 10 };
-  periodoAuto_old = { inicio: "", final: "" };
-  tareaAutomatica_old: TareaAutomatica = new TareaAutomatica(undefined, "", "", undefined, new Date(), new Date(), "", undefined, undefined, 10, "minutos");
-  tareaAutomaticaPer_old = "horas";
-  restDias_old = ['L', 'K', 'M', 'J', 'V', 'S', 'D'];
-  configAuto_old = false;
+  tareaActual_upd: Tarea = new Tarea(undefined, undefined, undefined, undefined, undefined, undefined, "ninguno", undefined, "ambos", undefined, undefined);
+  notificar_upd: boolean;
+  repetirHasta_upd: string = new Date().toISOString();
+  periodosActuales_upd: TareaPeriodo[] = [];
+  periodoAct_upd = { inicio: startOfDay(new Date()).toISOString(), final: startOfDay(new Date()).toISOString(), antNotif: 10 };
+  periodoAuto_upd = { inicio: "", final: "" };
+  tareaAutomatica_upd: TareaAutomatica = new TareaAutomatica(undefined, "", "", undefined, new Date(), new Date(), "", undefined, undefined, 10, "minutos");
+  tareaAutomaticaPer_upd = "horas";
+  restDias_upd = ['L', 'K', 'M', 'J', 'V', 'S', 'D'];
+  configAuto_upd = false;
 
   horas = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24];
   tareasPendientes = this.getTareasPendientes();
@@ -328,7 +337,28 @@ export class CalendarioTareasComponent {
 
   refresh: Subject<any> = new Subject();
   events: CalendarEvent[] = [];
+  dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+  dias_sub = ['L', 'K', 'M', 'J', 'V', 'S', 'D'];
+  diaEscogido = 'Lunes';
+  periodosPorDia = {
+    'Lunes': [], 'Martes': [], 'Miércoles': [], 'Jueves': [], 'Viernes': [], 'Sábado': [], 'Domingo': []
+  };
+  horariosEfectivos: HorarioEfectivoPorDia[] = [];
+  horarioEfectivoAux: HorarioEfectivoPorDia;
 
+  horariosEspecificos: HorarioEspecificoPorDia[] = [];
+  horarioEspecifico: HorarioEspecificoPorDia;
+  horarioEspecifico_aux = new Date().toISOString();
+
+  periodosGenerales: PeriodoGeneral[] = [];
+  periodosGenerales_Aux = [];
+  periodoGeneral = {
+    id_horario_general: undefined,
+    inicio: this.fromMinutosToDate(0).toISOString(),
+    final: this.fromMinutosToDate(0).toISOString()
+  }
+
+  periodosEspecificos: PeriodoEspecifico[] = [];
 
   @ViewChild("tabs", { static: false }) tabs: MatTabGroup;
 
@@ -340,13 +370,18 @@ export class CalendarioTareasComponent {
     public toastController: ToastController,
     public platform: Platform,
     public modalCtrl: ModalController,
-    public usuarioService: UsuarioService,
+    public authServive: AuthService,
     public tareaService: TareaService,
     public tareaPeriodoService: TareaPeriodoService,
     public tareaAutomaticaService: TareaAutomaticaService,
     public etiquetaService: EtiquetaService,
-    public etiquetaTareaService: EtiquetaTareaService) {
+    public etiquetaTareaService: EtiquetaTareaService,
+    public horarioEfectivoPorDiaService: HorarioEfectivoPorDiaService,
+    public horarioEspecificoPorDiaService: HorarioEspecificoPorDiaService,
+    public periodoGeneralService: PeriodoGeneralService,
+    public periodoEspecificoService: PeriodoEspecificoService) {
     //this.resetDB();
+
   }
 
   private readonly darkThemeClass = 'dark-theme';
@@ -362,21 +397,92 @@ export class CalendarioTareasComponent {
 
   async ngAfterViewInit() {
     setTimeout(() => {
-      console.log("REALINEANDO");
       this.tabs.selectedIndex = 0;
       this.tabs._tabHeader.focusIndex = 0;
       this.tabs._tabHeader._alignInkBarToSelectedTab(); this.tabs.realignInkBar();
     }, 1000);
 
     if (!true) await this.resetDB();
+
+    this.actualUser = this.authServive.actualUser;
+    console.log(this.actualUser);
     await this.getTareas();
 
     this.crearEventos();
     this.calcularTareasSinProcesar();
+    await this.cambiarDiaEscogido();
+  }
+
+  periodosDiaEscogido() {
+    return this.periodosPorDia[this.diaEscogido];
+  }
+
+  fromMinutosToDate(minutos): Date {
+    let date: Date = startOfDay(new Date());
+    date = addHours(date, Math.floor(minutos / 60));
+    date = addMinutes(date, minutos % 60);
+    return date;
+  }
+
+  async cambiarDiaEscogido() {
+    await this.cargarPeriodos();
+    for (let he of this.horariosEfectivos) if (this.dias_sub.indexOf(he.dia) == this.dias.indexOf(this.diaEscogido)) this.horarioEfectivoAux = he;
+
+    this.periodosGenerales_Aux = [];
+    for (let pg of this.periodosGenerales) {
+      if (this.horarioEfectivoAux.id_horario_efectivo == pg.id_horario_general) {
+        this.periodosGenerales_Aux.push({
+          id_horario_general: pg.id_horario_general,
+          inicio: this.fromMinutosToDate(pg.minutos_tiempo_inicial),
+          final: this.fromMinutosToDate(pg.minutos_tiempo_finalizacion)
+        })
+      }
+    }
+
+
+  }
+
+  async cargarPeriodos() {
+    this.horariosEfectivos = [];
+    this.horariosEspecificos = [];
+    this.periodosGenerales = [];
+    this.periodosEspecificos = [];
+
+    let horariosEfectivos_ = await this.horarioEfectivoPorDiaService.findAll().toPromise() as HorarioEfectivoPorDia[];
+    for (let he of horariosEfectivos_) if (he.id_usuario == this.actualUser.id_usuario) this.horariosEfectivos.push(he);
+
+    let horariosEspecificos_ = await this.horarioEspecificoPorDiaService.findAll().toPromise() as HorarioEspecificoPorDia[];
+    for (let he of this.horariosEfectivos) for (let hes of horariosEspecificos_) if (he.id_horario_efectivo == hes.id_horario_efectivo) this.horariosEspecificos.push(hes);
+
+    let periodosGenerales_ = await this.periodoGeneralService.findAll().toPromise() as PeriodoGeneral[];
+    for (let he of this.horariosEfectivos) for (let pg of periodosGenerales_) if (he.id_horario_efectivo == pg.id_horario_general) this.periodosGenerales.push(pg);
+
+    let periodosEspecificos_ = await this.periodoEspecificoService.findAll().toPromise() as PeriodoEspecifico[];
+    for (let hes of this.horariosEspecificos) for (let pe of periodosEspecificos_) if (hes.id_horario_especifico == pe.id_horario_especifico) this.periodosEspecificos.push(pe);
+
+    if (this.horariosEfectivos.length == 0) {
+      let maxIdHE = 0;
+      for (let he of horariosEfectivos_) if (he.id_horario_efectivo > maxIdHE) maxIdHE = he.id_horario_efectivo;
+
+      for (let i = 0; i < this.dias.length; i++) {
+        let dia = this.dias_sub[i];
+        await this.horarioEfectivoPorDiaService.create(new HorarioEfectivoPorDia(maxIdHE + i + 1, dia, this.actualUser.id_usuario)).toPromise();
+      }
+
+      horariosEfectivos_ = await this.horarioEfectivoPorDiaService.findAll().toPromise() as HorarioEfectivoPorDia[];
+      for (let he of horariosEfectivos_) if (he.id_usuario == this.actualUser.id_usuario) this.horariosEfectivos.push(he);
+
+    }
+    console.log(this.horariosEfectivos);
+
+  }
+
+  fromDaySubToNum(dia_sub) {
+    return this.dias_sub.indexOf(dia_sub);
   }
 
   async resetDB() {
-    await this.usuarioService.deleteAll().toPromise();
+    //await this.usuarioService.deleteAll().toPromise();
     await this.tareaService.deleteAll().toPromise();
     await this.tareaPeriodoService.deleteAll().toPromise();
     await this.tareaAutomaticaService.deleteAll().toPromise();
@@ -389,8 +495,8 @@ export class CalendarioTareasComponent {
       new Usuario(2, "Jeremy", "Tencio Morales", "hola", "jdtm23@gmail.com",
         "Desarrollador", "La vida es profunda", undefined, undefined),
     ]
-    await this.usuarioService.create(usuarios_const[0]).toPromise();
-    await this.usuarioService.create(usuarios_const[1]).toPromise();
+    //await this.usuarioService.create(usuarios_const[0]).toPromise();
+    //await this.usuarioService.create(usuarios_const[1]).toPromise();
 
     let tareas_const: Tarea[] = [
       new Tarea(0, 0, 1, undefined, "Investigar sobre blockchain",
@@ -431,14 +537,12 @@ export class CalendarioTareasComponent {
   }
 
   async getTareas() {
-    this.usuarios = [];
+    //this.usuarios = [];
     this.tareas = [];
     this.tareas_periodos = [];
     this.tareas_automaticas = [];
 
-    this.usuarios = await this.usuarioService.findAll().toPromise() as Usuario[];
-    this.actualUser = this.usuarios[0];
-
+    //this.usuarios = await this.usuarioService.findAll().toPromise() as Usuario[];
 
     let allTareas = await this.tareaService.findAll().toPromise() as Tarea[];
 
@@ -489,8 +593,14 @@ export class CalendarioTareasComponent {
 
   crearEventos() {
     this.events = [];
+
     for (let tarea of this.tareas) {
-      let colorTarea = randomColor();
+      let colorTarea = undefined;
+      for (let color of this.colores) if (color.id_tarea == tarea.id_tarea) colorTarea = color.color_tarea;
+      if (colorTarea == undefined) {
+        colorTarea = randomColor();
+        this.colores.push({ id_tarea: tarea.id_tarea, color_tarea: colorTarea });
+      }
       for (let periodo of this.tareas_periodos) {
         if (tarea.id_tarea == periodo.id_tarea) {
           this.events.push(nuevoEvento(tarea.id_tarea, periodo.fecha_hora_inicio_original, periodo.fecha_hora_final_original, tarea.nombre_tarea, colorTarea));
@@ -501,7 +611,10 @@ export class CalendarioTareasComponent {
 
   cambiarConfigAuto() {
     this.configAuto = !this.configAuto;
+  }
 
+  cambiarConfigAuto_upd() {
+    this.configAuto_upd = !this.configAuto_upd;
   }
 
   async programarTareas() {
@@ -537,11 +650,11 @@ export class CalendarioTareasComponent {
     for (let tarea of allTareas) if (tarea.id_tarea > maxId) maxId = tarea.id_tarea;
     this.tareaActual.id_tarea = maxId + 1;
 
-    this.tareaActual.repetir_hasta = isoStringToDate(this.repetirHasta);
+    this.tareaActual.repetir_hasta = (this.tareaActual.repetir_hasta) ? isoStringToDate(this.repetirHasta) : this.tareaActual.repetir_hasta;
     this.tareaActual.id_usuario = this.actualUser.id_usuario;
     this.tareaActual.notificar = (this.notificar) ? "1" : "0";
     if (this.tareaActual.notificar == "0") this.tareaActual.modo_notificar = undefined;
-    if (this.tareaActual.repeticion != "ninguno") { this.tareaActual.repeticion = undefined; this.tareaActual.repetir_hasta = undefined; }
+    if (this.tareaActual.repeticion == "ninguno") { this.tareaActual.repeticion = undefined; this.tareaActual.repetir_hasta = undefined; }
 
     await this.tareaService.create(this.tareaActual).toPromise();
     //this.tareas.push(deepCopy(this.tareaActual) as Tarea);
@@ -556,11 +669,137 @@ export class CalendarioTareasComponent {
         //this.tareas_periodos.push(deepCopy(periodo) as TareaPeriodo);
         // meter en BD
       }
-      this.events = [];
       await this.getTareas();
       this.crearEventos();
     } else {
       this.tareaAutomatica.id_tarea = maxId + 1;
+      this.tareaAutomatica.restriccion_inicio = (this.periodoAuto.inicio == "") ? undefined : isoStringToDate(this.periodoAuto.inicio);
+      this.tareaAutomatica.restriccion_finalizacion = (this.periodoAuto.final == "") ? undefined : isoStringToDate(this.periodoAuto.final);
+      this.tareaAutomatica.restriccion_dias = "";
+      for (let rest of this.restDias) this.tareaAutomatica.restriccion_dias += rest;
+      // guarda los minutos 
+      if (this.tareaActual.notificar == "0") this.tareaAutomatica.antelacion_notificacion = undefined;
+
+      await this.tareaAutomaticaService.create(this.tareaAutomatica).toPromise();
+      //this.tareas_automaticas.push(deepCopy(this.tareaAutomatica) as TareaAutomatica);
+      // meter en BD
+      await this.getTareas();
+      this.calcularTareasSinProcesar();
+    }
+
+    await this.tostearPan('¡La tarea \"' + this.tareaActual.nombre_tarea + '\" ha sido registrada con éxito!');
+  }
+
+  async borrarTarea() {
+    await this.tareaService.delete(this.tareaActual_upd.id_tarea).toPromise();
+
+    await this.getTareas();
+    this.calcularTareasSinProcesar();
+    this.crearEventos();
+    this.modal.dismissAll();
+    await this.tostearPan('¡La tarea \"' + this.tareaActual_upd.nombre_tarea + '\" ha sido eliminada permanentemente!');
+
+  }
+
+  async actualizarTarea() {
+
+    if (this.tareaActual_upd.modo_tarea == undefined) {
+      await this.tostearPan('¡Tarea no actualizada! Debe indicar algún de programación de la tarea (Manual o Automático).');
+      return;
+    }
+
+    this.tareaActual_upd.repetir_hasta = (this.tareaActual_upd.repetir_hasta) ? isoStringToDate(this.repetirHasta_upd) : this.tareaActual_upd.repetir_hasta;
+    this.tareaActual_upd.id_usuario = this.actualUser.id_usuario;
+    this.tareaActual_upd.notificar = (this.notificar_upd) ? "1" : "0";
+    if (this.tareaActual_upd.notificar == "0") this.tareaActual_upd.modo_notificar = undefined;
+    if (this.tareaActual_upd.repeticion == "ninguno") { this.tareaActual_upd.repeticion = undefined; this.tareaActual_upd.repetir_hasta = undefined; }
+
+    let tareaActualOld: Tarea;
+    for (let tarea of this.tareas) if (tarea.id_tarea == this.tareaActual_upd.id_tarea) tareaActualOld = tarea;
+
+    await this.tareaService.update(this.tareaActual_upd.id_tarea, this.tareaActual_upd).toPromise();
+
+    if (this.tareaActual_upd.modo_tarea == "manual" && tareaActualOld.modo_tarea == "manual") {
+      console.log("MM");
+
+      for (let tareaPeriodo of this.tareas_periodos) {
+        if (tareaPeriodo.id_tarea == this.tareaActual_upd.id_tarea) {
+          await this.tareaPeriodoService.delete(tareaPeriodo.id_tarea, this.pasarDateIso(tareaPeriodo.fecha_hora_inicio_original), this.pasarDateIso(tareaPeriodo.fecha_hora_final_original)).toPromise();
+        }
+      }
+
+      for (let tareaPeriodo of this.periodosActuales_upd) {
+        await this.tareaPeriodoService.create(tareaPeriodo).toPromise();
+      }
+
+    } else if (this.tareaActual_upd.modo_tarea == "manual" && tareaActualOld.modo_tarea == "automatico") {
+      console.log("MA");
+
+      await this.tareaAutomaticaService.delete(this.tareaActual_upd.id_tarea).toPromise();
+      for (let tareaPeriodo of this.periodosActuales_upd) {
+        await this.tareaPeriodoService.create(tareaPeriodo).toPromise();
+      }
+
+
+    } else if (this.tareaActual_upd.modo_tarea == "automatico" && tareaActualOld.modo_tarea == "automatico") {
+      console.log("AA");
+
+      this.tareaAutomatica_upd.id_tarea = this.tareaActual_upd.id_tarea;
+      this.tareaAutomatica_upd.restriccion_inicio = (this.periodoAuto_upd.inicio == "") ? undefined : isoStringToDate(this.periodoAuto_upd.inicio);
+      this.tareaAutomatica_upd.restriccion_finalizacion = (this.periodoAuto_upd.final == "") ? undefined : isoStringToDate(this.periodoAuto_upd.final);
+      this.tareaAutomatica_upd.restriccion_dias = "";
+      for (let rest of this.restDias_upd) this.tareaAutomatica_upd.restriccion_dias += rest;
+      // guarda los minutos 
+      if (this.tareaActual_upd.notificar == "0") this.tareaAutomatica_upd.antelacion_notificacion = undefined;
+
+      await this.tareaAutomaticaService.update(this.tareaAutomatica_upd.id_tarea, this.tareaAutomatica_upd).toPromise();
+
+    } else { // automatico y manual
+      console.log("AM");
+
+      for (let tareaPeriodo of this.tareas_periodos) {
+        if (tareaPeriodo.id_tarea == this.tareaActual_upd.id_tarea) {
+          await this.tareaPeriodoService.delete(tareaPeriodo.id_tarea, this.pasarDateIso(tareaPeriodo.fecha_hora_inicio_original), this.pasarDateIso(tareaPeriodo.fecha_hora_final_original)).toPromise();
+        }
+      }
+
+      this.tareaAutomatica_upd.id_tarea = this.tareaActual_upd.id_tarea;
+      this.tareaAutomatica_upd.restriccion_inicio = (this.periodoAuto_upd.inicio == "") ? undefined : isoStringToDate(this.periodoAuto_upd.inicio);
+      this.tareaAutomatica_upd.restriccion_finalizacion = (this.periodoAuto_upd.final == "") ? undefined : isoStringToDate(this.periodoAuto_upd.final);
+      this.tareaAutomatica_upd.restriccion_dias = "";
+      for (let rest of this.restDias_upd) this.tareaAutomatica_upd.restriccion_dias += rest;
+      // guarda los minutos 
+      if (this.tareaActual_upd.notificar == "0") this.tareaAutomatica_upd.antelacion_notificacion = undefined;
+
+      await this.tareaAutomaticaService.create(this.tareaAutomatica_upd).toPromise();
+
+
+    }
+
+    await this.getTareas();
+    this.calcularTareasSinProcesar();
+    this.crearEventos();
+    this.modal.dismissAll();
+    await this.tostearPan('¡La tarea \"' + this.tareaActual_upd.nombre_tarea + '\" ha sido actualizada con éxito!');
+
+    //this.tareas.push(deepCopy(this.tareaActual) as Tarea);
+    // meter en BD
+    return;
+
+    if (this.tareaActual.modo_tarea == "manual") {
+      for (let periodo of this.periodosActuales) {
+        periodo.id_tarea = 0 + 1;
+        if (this.tareaActual.notificar == "0") periodo.antelacion_notificacion = undefined;
+
+        await this.tareaPeriodoService.create(periodo).toPromise();
+        //this.tareas_periodos.push(deepCopy(periodo) as TareaPeriodo);
+        // meter en BD
+      }
+      this.events = [];
+      await this.getTareas();
+      this.crearEventos();
+    } else {
+      this.tareaAutomatica.id_tarea = 0 + 1;
       this.tareaAutomatica.restriccion_inicio = (this.periodoAuto.inicio == "") ? undefined : isoStringToDate(this.periodoAuto.inicio);
       this.tareaAutomatica.restriccion_finalizacion = (this.periodoAuto.final == "") ? undefined : isoStringToDate(this.periodoAuto.final);
       this.tareaAutomatica.restriccion_dias = "";
@@ -578,6 +817,8 @@ export class CalendarioTareasComponent {
     }
 
     await this.tostearPan('¡La tarea \"' + this.tareaActual.nombre_tarea + '\" ha sido registrada con éxito!');
+
+
   }
 
   async tostearPan(mensaje: string) {
@@ -595,6 +836,42 @@ export class CalendarioTareasComponent {
 
   borrarPeriodo(i) {
     this.periodosActuales.splice(i, 1);
+  }
+
+  agregarPeriodo_upd() {
+    this.periodosActuales_upd.push(new TareaPeriodo(this.tareaActual_upd.id_tarea, isoStringToDate(this.periodoAct_upd.inicio), isoStringToDate(this.periodoAct_upd.final), undefined, undefined, this.periodoAct_upd.antNotif));
+  }
+
+  fromDateToMinutes(date: Date) {
+    let minutos = 0;
+    minutos += date.getHours() * 60;
+    minutos += date.getMinutes();
+    return minutos;
+  }
+
+  async agregarPeriodo_PG() {
+    await this.periodoGeneralService.create(new PeriodoGeneral(this.horarioEfectivoAux.id_horario_efectivo,
+      this.fromDateToMinutes(isoStringToDate(this.periodoGeneral.inicio)),
+      this.fromDateToMinutes(isoStringToDate(this.periodoGeneral.final))
+    )).toPromise();
+    await this.cambiarDiaEscogido();
+    //this.periodosActuales_upd.push(new TareaPeriodo(this.tareaActual_upd.id_tarea, isoStringToDate(this.periodoAct_upd.inicio), isoStringToDate(this.periodoAct_upd.final), undefined, undefined, this.periodoAct_upd.antNotif));
+  }
+
+  async borrarPeriodo_PG(i: number) {
+    let periodoGeneralBorrar = this.periodosGenerales_Aux[i];
+
+    await this.periodoGeneralService.delete(this.horarioEfectivoAux.id_horario_efectivo,
+      this.fromDateToMinutes(periodoGeneralBorrar.inicio),
+      this.fromDateToMinutes(periodoGeneralBorrar.final)
+    ).toPromise();
+    await this.cambiarDiaEscogido();
+    //this.periodosActuales_upd.push(new TareaPeriodo(this.tareaActual_upd.id_tarea, isoStringToDate(this.periodoAct_upd.inicio), isoStringToDate(this.periodoAct_upd.final), undefined, undefined, this.periodoAct_upd.antNotif));
+
+  }
+
+  borrarPeriodo_upd(i) {
+    this.periodosActuales_upd.splice(i, 1);
   }
 
   abrirPendientes() {
@@ -632,14 +909,15 @@ export class CalendarioTareasComponent {
     for (let tarea of this.tareas) if (tarea.id_tarea == event.id) tareaEvento = tarea;
     //console.log(this.tareas_periodos);
     //console.log(subHours(this.tareas_periodos[3].fecha_hora_inicio_original, 6).toISOString());
+
     for (let tareaP of this.tareas_periodos) {
       if (tareaP.id_tarea == event.id &&
-        tareaP.fecha_hora_inicio_original == event.start &&
-        tareaP.fecha_hora_final_original == event.end) {
+        tareaP.fecha_hora_inicio_original.getTime() == addHours(event.start, 6).getTime() &&
+        tareaP.fecha_hora_final_original.getTime() == addHours(event.end, 6).getTime()) {
         //console.log(tareaP);
-        tareaPeriodoEvento = tareaP;
-        tareaPeriodoEvento.fecha_hora_inicio_original = this.pasarDateIso(newStart);
-        tareaPeriodoEvento.fecha_hora_final_original = this.pasarDateIso(newEnd);
+        tareaPeriodoEvento = deepCopy(tareaP);
+        tareaPeriodoEvento.fecha_hora_inicio_original = this.pasarDateIso(addHours(newStart, 6));
+        tareaPeriodoEvento.fecha_hora_final_original = this.pasarDateIso(addHours(newEnd, 6));
         tareaPeriodoEvento.fecha_hora_inicio_real = (tareaPeriodoEvento.fecha_hora_inicio_real)
           ? this.pasarDateIso(tareaPeriodoEvento.fecha_hora_inicio_real) : tareaPeriodoEvento.fecha_hora_inicio_real;
         tareaPeriodoEvento.fecha_hora_final_real = (tareaPeriodoEvento.fecha_hora_final_real)
@@ -647,11 +925,12 @@ export class CalendarioTareasComponent {
         break;
       }
     }
+
     //console.log(tareaPeriodoEvento, this.pasarDateIso(event.start), this.pasarDateIso(event.end));
     //console.log(await this.tareaPeriodoService.findAll().toPromise());
     //console.log(await this.tareaPeriodoService.findByPk(tareaPeriodoEvento.id_tarea, this.pasarDateIso(event.start), this.pasarDateIso(event.end)).toPromise());
     //return;
-    await this.tareaPeriodoService.update(tareaPeriodoEvento.id_tarea, this.pasarDateIso(event.start), this.pasarDateIso(event.end), tareaPeriodoEvento).toPromise();
+    await this.tareaPeriodoService.update(tareaPeriodoEvento.id_tarea, this.pasarDateIso(addHours(event.start, 6)), this.pasarDateIso(addHours(event.end, 6)), tareaPeriodoEvento).toPromise();
     await this.getTareas();
     this.crearEventos();
     this.calcularTareasSinProcesar();
@@ -675,13 +954,133 @@ export class CalendarioTareasComponent {
   }
 
   handleEvent(action: string, event: CalendarEvent): void {
-    console.log(event);
+    //console.log(event);
     if (action != 'Clicked') return;
 
-    let modalUpdateAbierto: NgbModalRef = this.modal.open(this.updateTareaModal, { size: 'lg', centered: true, windowClass: 'modalWTF', backdropClass: 'modalWTF' });
+    this.modal.open(this.updateTareaModal, { size: 'lg', centered: true, windowClass: 'modalWTF', backdropClass: 'modalWTF' });
+    this.cargarTareaUpdate(event);
 
     //this.modalData = { event, action };
     //this.modal.open(this.modalContent, { size: 'lg' });
+  }
+
+  abrirUpdatePendiente(indiceTarea: number) {
+    console.log(this.tareas_periodos);
+    this.modal.open(this.updateTareaModal, { size: 'lg', centered: true, windowClass: 'modalWTF', backdropClass: 'modalWTF' });
+
+
+    let tareaEvento: Tarea = this.tareasPendientes[indiceTarea];
+
+    //for (let tarea of this.tareas) if (tarea.id_tarea == indiceTarea) tareaEvento = tarea;
+    //console.log(this.tareas_periodos);
+    //console.log(subHours(this.tareas_periodos[3].fecha_hora_inicio_original, 6).toISOString());
+
+    this.tareaActual_upd = deepCopy(tareaEvento);
+    this.tareaActual_upd.repeticion = (this.tareaActual_upd.repeticion) ? this.tareaActual_upd.repeticion : "ninguno";
+    this.notificar_upd = this.tareaActual_upd.notificar == "1";
+    this.repetirHasta_upd = (this.tareaActual_upd.repetir_hasta) ? this.tareaActual_upd.repetir_hasta.toISOString() : undefined;
+    this.periodosActuales_upd = [];
+    this.periodoAct_upd = { inicio: startOfDay(new Date()).toISOString(), final: startOfDay(new Date()).toISOString(), antNotif: 10 };
+    this.periodoAuto_upd = { inicio: "", final: "" };
+    this.tareaAutomatica_upd = new TareaAutomatica(undefined, "muy alto", "muy alto", 1, new Date(), new Date(), "", undefined, undefined, 10, "horas");
+    this.tareaAutomaticaPer_upd = "horas";
+    this.restDias_upd = ['L', 'K', 'M', 'J', 'V', 'S', 'D'];
+    this.configAuto_upd = false;
+
+
+
+    if (tareaEvento.modo_tarea == "manual") {
+
+      for (let tareaP of this.tareas_periodos) {
+        if (tareaP.id_tarea == tareaEvento.id_tarea) {
+          let tareaPeriodo = deepCopy(tareaP) as TareaPeriodo;
+          tareaPeriodo.fecha_hora_inicio_original = subHours(tareaPeriodo.fecha_hora_inicio_original, 6);
+          tareaPeriodo.fecha_hora_final_original = subHours(tareaPeriodo.fecha_hora_final_original, 6);
+          tareaPeriodo.fecha_hora_inicio_real = (tareaPeriodo.fecha_hora_inicio_real) ? subHours(tareaPeriodo.fecha_hora_inicio_real, 6) : tareaPeriodo.fecha_hora_inicio_real;
+          tareaPeriodo.fecha_hora_final_real = (tareaPeriodo.fecha_hora_final_real) ? subHours(tareaPeriodo.fecha_hora_final_real, 6) : tareaPeriodo.fecha_hora_inicio_real;
+          console.log(tareaPeriodo);
+
+          this.periodosActuales_upd.push(tareaPeriodo);
+        }
+      }
+
+    } else {
+
+      for (let tareaA of this.tareas_automaticas) {
+        if (tareaA.id_tarea == tareaEvento.id_tarea) {
+          this.tareaAutomatica_upd = deepCopy(tareaA);
+          this.tareaAutomaticaPer_upd = this.tareaAutomatica_upd.duracion_estimada_medida;
+          this.restDias_upd = [];
+          for (let dia of this.tareaAutomatica_upd.restriccion_dias) this.restDias_upd.push(dia);
+          break;
+        }
+      }
+
+    }
+
+  }
+
+  cargarTareaUpdate(event: CalendarEvent) {
+
+    let tareaEvento: Tarea;
+    let tareaPeriodoEvento;
+
+    for (let tarea of this.tareas) if (tarea.id_tarea == event.id) tareaEvento = tarea;
+    //console.log(this.tareas_periodos);
+    //console.log(subHours(this.tareas_periodos[3].fecha_hora_inicio_original, 6).toISOString());
+
+    this.tareaActual_upd = deepCopy(tareaEvento);
+    this.tareaActual_upd.repeticion = (this.tareaActual_upd.repeticion) ? this.tareaActual_upd.repeticion : "ninguno";
+    this.notificar_upd = this.tareaActual_upd.notificar == "1";
+    this.repetirHasta_upd = (this.tareaActual_upd.repetir_hasta) ? this.tareaActual_upd.repetir_hasta.toISOString() : undefined;
+    this.periodosActuales_upd = [];
+    this.periodoAct_upd = { inicio: startOfDay(new Date()).toISOString(), final: startOfDay(new Date()).toISOString(), antNotif: 10 };
+    this.periodoAuto_upd = { inicio: "", final: "" };
+    this.tareaAutomatica_upd = new TareaAutomatica(undefined, "muy alto", "muy alto", 1, new Date(), new Date(), "", undefined, undefined, 10, "horas");
+    this.tareaAutomaticaPer_upd = "horas";
+    this.restDias_upd = ['L', 'K', 'M', 'J', 'V', 'S', 'D'];
+    this.configAuto_upd = false;
+
+    for (let tareaP of this.tareas_periodos) {
+      if (tareaP.id_tarea == event.id /*&&
+            tareaP.fecha_hora_inicio_original.getTime() == addHours(event.start, 6).getTime() &&
+            tareaP.fecha_hora_final_original.getTime() == addHours(event.end, 6).getTime()*/) {
+
+        let tareaPeriodo = deepCopy(tareaP) as TareaPeriodo;
+        tareaPeriodo.fecha_hora_inicio_original = subHours(tareaPeriodo.fecha_hora_inicio_original, 6);
+        tareaPeriodo.fecha_hora_final_original = subHours(tareaPeriodo.fecha_hora_final_original, 6);
+        tareaPeriodo.fecha_hora_inicio_real = (tareaPeriodo.fecha_hora_inicio_real) ? subHours(tareaPeriodo.fecha_hora_inicio_real, 6) : tareaPeriodo.fecha_hora_inicio_real;
+        tareaPeriodo.fecha_hora_final_real = (tareaPeriodo.fecha_hora_final_real) ? subHours(tareaPeriodo.fecha_hora_final_real, 6) : tareaPeriodo.fecha_hora_inicio_real;
+        console.log(tareaPeriodo);
+
+        this.periodosActuales_upd.push(tareaPeriodo);
+      }
+    }
+
+    if (tareaEvento.modo_tarea == "manual") {
+      /*
+            for (let tareaP of this.tareas_periodos) {
+              if (tareaP.id_tarea == event.id) {
+                this.periodosActuales_upd.push(tareaP);
+              }
+            }*/
+
+    } else {
+
+      for (let tareaA of this.tareas_automaticas) {
+        if (tareaA.id_tarea == event.id) {
+          this.tareaAutomatica_upd = tareaA;
+          break;
+        }
+      }
+
+    }
+
+
+  }
+
+  cambiarModo_upd() {
+    this.tareaActual_upd.modo_tarea = (this.tareaActual_upd.modo_tarea == "manual") ? "automatico" : "manual";
   }
 
   setView(view: CalendarView) {

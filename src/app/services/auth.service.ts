@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { IniciarSesionPage } from '../iniciar-sesion/iniciar-sesion.page';
-import {Usuario} from '../tempus-models/usuario';
-import {UsuarioService} from '../services/usuario.service'
+import { Usuario } from '../tempus-models/usuario';
+import { UsuarioService } from '../services/usuario.service'
 
 @Injectable({
   providedIn: 'root'
@@ -23,21 +23,21 @@ export class AuthService {
       this.cuentaActual=cuentaActual
     } 
   }
-  public cuentaActual='Estudiante';
-  public actualUser : Usuario = 
-  {
-    id_usuario:null,
-    nombre : "hola",
-    apellidos : "hola",
-    correo_electronico : "12345678",
-    contrasenna : "12345678",
-    tipo_usuario:null,
-    descripcion_personal: "hola@gmail.com",
-    compannia: "password",
-    foto_perfil:null
-  };
-  login(usuario){
-    return new Promise((resolve,rejected)=>{
+  public cuentaActual = 'Estudiante';
+  public actualUser: Usuario =
+    {
+      id_usuario: null,
+      nombre: "hola",
+      apellidos: "hola",
+      correo_electronico: "12345678",
+      contrasenna: "12345678",
+      tipo_usuario: null,
+      descripcion_personal: "hola@gmail.com",
+      compannia: "password",
+      foto_perfil: null
+    };
+  login(usuario) {
+    return new Promise((resolve, rejected) => {
 
       this.actualUser = usuario;
       
@@ -47,7 +47,7 @@ export class AuthService {
         rejected(null);
       };
       resolve(usuario);
-  })
+    })
 
   }
   menuIndex(index){

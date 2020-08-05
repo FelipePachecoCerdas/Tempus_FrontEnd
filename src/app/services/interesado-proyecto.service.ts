@@ -13,7 +13,7 @@ export class InteresadoProyectoService {
   create(data) {
     return this.https.post(baseUrl, data);
   }
-  
+
   findAll() {
     return this.https.get(baseUrl);
   }
@@ -21,7 +21,7 @@ export class InteresadoProyectoService {
   async findByPk(id_interesado, id_proyecto) {
     return this.https.get(`${baseUrl}/id_proyecto/${id_proyecto}/id_interesado/${id_interesado}`);
   }
-  
+
 
   update(id_interesado, id_proyecto, data) {
     return this.https.put(`${baseUrl}/id_proyecto/${id_proyecto}/id_interesado/${id_interesado}`, data);
@@ -47,8 +47,9 @@ export class InteresadoProyectoService {
     return this.https.get(`${baseUrl}/id_interesado/${id_interesado}`);
   }
 
-  query(consulta){
-    return this.https.post(`${baseUrl}/consulta`,consulta);
+  query(consulta) {
+    return this.https.post(`${baseUrl}/consulta`, consulta);
   }
 
 }
+

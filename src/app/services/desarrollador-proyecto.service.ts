@@ -13,7 +13,7 @@ export class DesarrolladorProyectoService {
   create(data) {
     return this.https.post(baseUrl, data);
   }
-  
+
   findAll() {
     return this.https.get(baseUrl);
   }
@@ -21,7 +21,7 @@ export class DesarrolladorProyectoService {
   async findByPk(id_desarrollador, id_proyecto) {
     return this.https.get(`${baseUrl}/id_proyecto/${id_proyecto}/id_desarrollador/${id_desarrollador}`);
   }
-  
+
 
   update(id_desarrollador, id_proyecto, data) {
     return this.https.put(`${baseUrl}/id_proyecto/${id_proyecto}/id_desarrollador/${id_desarrollador}`, data);
@@ -46,9 +46,10 @@ export class DesarrolladorProyectoService {
   findByDeveloperId(id_desarrollador) {
     return this.https.get(`${baseUrl}/id_desarrollador/${id_desarrollador}`);
   }
-  
-  query(consulta){
-    return this.https.post(`${baseUrl}/consulta`,consulta);
+
+  query(consulta) {
+    return this.https.post(`${baseUrl}/consulta`, consulta);
   }
 
 }
+
