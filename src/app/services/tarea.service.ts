@@ -42,6 +42,9 @@ export class TareaService {
   findByUserId(id_usuario) {
     return this.https.get(`${baseUrl}/id_usuario/${id_usuario}`);
   }
+  findByActivityId(id_actividad_proyecto) {
+    return this.https.get(`${baseUrl}/id_actividad_proyecto/${id_actividad_proyecto}`);
+  }
 
   findByUserActivityId(id_usuario,id_actividad) {
     return this.https.get(`${baseUrl}/id_usuario/${id_usuario}/id_actividad/${id_actividad}`);

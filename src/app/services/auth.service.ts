@@ -41,12 +41,12 @@ export class AuthService {
 
       this.actualUser = usuario;
       
-      this.sesion.setItem("user",JSON.stringify(usuario));
+      this.sesion.setItem("user",usuario!=null?JSON.stringify(usuario):null);
       this.sesion.setItem("cuentaActual","Estudiante")
-      if (Object.keys(usuario).length === 0){
+      if(usuario!=null){if (Object.keys(usuario).length === 0){
         rejected(null);
       };
-      resolve(usuario);
+      resolve(usuario);}
     })
 
   }

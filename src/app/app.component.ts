@@ -25,15 +25,18 @@ export class AppComponent implements OnInit {
   cambiarCuenta(cuenta){
     this.authService.currentAccount(cuenta.target.value)
     this.authService.menuIndex(0)
+    this.cuentaActual=cuenta.target.value
     this.selectedIndex=0
     if(cuenta.target.value=='Estudiante')this.paginasMenu=this.paginasEstudiante
     if(cuenta.target.value=='Desarrollador')this.paginasMenu=this.paginasDesarrollador
     if(cuenta.target.value=='Interesado')this.paginasMenu=this.paginasInteresado
     if(cuenta.target.value=='Administrador')this.paginasMenu=this.paginasAdministrador
     this.navCtrl.navigateRoot(this.paginasMenu[0].url);
-    
-
-    
+  }
+  cerrarSesion(){
+    //console.log("hola")
+    //this.user=null
+    //this.authService.login(null)
   }
 
   public paginasMenu=[]

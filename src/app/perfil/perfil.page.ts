@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router'
-import { MenuController, AlertController } from '@ionic/angular'
+import { MenuController, AlertController, NavController } from '@ionic/angular'
 import { UsuarioService } from '../services/usuario.service'
 import { Usuario } from '../tempus-models/usuario';
 import { AppComponent } from '../app.component'
@@ -25,7 +25,7 @@ export class PerfilPage implements OnInit {
   proyectos_desarrollador: any
   constructor(private authService: AuthService, private proyectoService: ProyectoService, private desarrolladorProyectoService: DesarrolladorProyectoService
     , private appComponent: AppComponent, private alertController: AlertController, private menuCtrl: MenuController,
-    private interesadoProyectoService: InteresadoProyectoService, private usuarioService: UsuarioService
+    private interesadoProyectoService: InteresadoProyectoService, private usuarioService: UsuarioService,private navCtrl:NavController
     ,/*private authService : AuthService,private alertService : AlertService,*/ private formBuilder: FormBuilder, public router: Router) {
   }
 
@@ -110,6 +110,7 @@ export class PerfilPage implements OnInit {
 
 
   async ngOnInit() {
+    //if(this.authService.actualUser.id_usuario==null) this.navCtrl.navigateRoot('/inicio');
     this.RegisterForm =
       this.formBuilder.group({
         'nombre': new FormControl(this.appComponent.user.nombre, Validators.required),

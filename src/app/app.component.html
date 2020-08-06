@@ -48,7 +48,7 @@
           </ion-item>
         </ion-menu-toggle>
         <ion-menu-toggle>
-          <ion-item>
+          <ion-item lines="none">
             <ion-label position="stacked">Cambio de Perfil</ion-label>
                       <ion-select [value]="cuentaActual" (ionChange)="cambiarCuenta($event)" okText="Aceptar" cancelText="Cancelar">
                         <ion-select-option value="Estudiante">Estudiante</ion-select-option>
@@ -58,8 +58,16 @@
                         
                       </ion-select>
 
+          </ion-item >
+        </ion-menu-toggle>
+
+          <ion-menu-toggle>
+            <ion-item [routerLink]="['/inicio']" detail="false" lines="none" (click)="cerrarSesion()">
+            <ion-icon slot="start"name="log-out-outline"></ion-icon>
+            <ion-label>Cerrar Sesión</ion-label>
           </ion-item>
         </ion-menu-toggle>
+        
       </ion-list>
     </ion-content>
   </ion-menu>

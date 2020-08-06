@@ -7,24 +7,281 @@
   </ion-toolbar>
 
 </ion-header>
-<ion-content>
+<ion-content *ngIf="appComponent.cuentaActual=='Interesado'">
   <mat-tab-group #tabs [selectedIndex]="cero">
-    <mat-tab label="Cuenta">
+    <mat-tab label="Horas trabajadas por Desarrollador">
       <div class="ion-padding">
         <ion-card >
-          <ion-card-header>
-            Bar Chart
+          <ion-card-header style="text-align: center;">
+            <ion-text color="primary"  class="title">Horas trabajadas por Desarrollador
+            </ion-text>
           </ion-card-header>
-          <ion-card-content >
-            <canvas maintainAspectRatio="true"  class="charts" #barCanvas></canvas>
+          <ion-item >
+            <ion-label position="floating">Nombre del Proyecto: </ion-label>
+          <ion-select class="texto"   placeholder="Seleccione un proyecto" (ionChange)="horasTInteresado($event)" okText="Aceptar" cancelText="Cancelar">
+            <ion-select-option *ngFor="let p of proyectosInteresado" value="{{p.id_proyecto}}">{{p.nombre_proyecto}}</ion-select-option>
+            
+          </ion-select>
+        </ion-item>
+          <ion-card-content id="TPIcontent" >
+            
+            <canvas maintainAspectRatio="true"  class="charts2" #barCanvas></canvas>
+            
           </ion-card-content>
         </ion-card>
     </div>
     </mat-tab>
-    <mat-tab label="Proyectos"> 
-      <div>
+    <mat-tab label="Tareas por Actividad">
+      <div class="ion-padding">
+        <ion-card >
+          <ion-card-header style="text-align: center;">
+            <ion-text color="primary"  class="title">Tareas por Actividad
+            </ion-text>
+          </ion-card-header>
+          <ion-item >
+            <ion-label position="floating">Nombre del Proyecto: </ion-label>
+          <ion-select class="texto"  placeholder="Seleccione un proyecto" (ionChange)="tareasAInteresado($event)" okText="Aceptar" cancelText="Cancelar">
+            <ion-select-option  *ngFor="let p of proyectosInteresado" value="{{p.id_proyecto}}">{{p.nombre_proyecto}}</ion-select-option>
+            
+          </ion-select>
+        </ion-item>
+          <ion-card-content id="TPIcontent2" >
+            <canvas maintainAspectRatio="true"  class="charts2" #barCanvas2></canvas>
+          </ion-card-content>
+        </ion-card>
+    </div>
+    </mat-tab>
+    <mat-tab label="Tareas por Desarrollador">
+      <div class="ion-padding">
+        <ion-card >
+          <ion-card-header style="text-align: center;">
+            <ion-text color="primary"  class="title">Tareas por Desarrollador
+            </ion-text>
+          </ion-card-header>
+          <ion-item >
+            <ion-label position="floating">Nombre del Proyecto: </ion-label>
+          <ion-select class="texto"  placeholder="Seleccione un proyecto" (ionChange)="tareasDInteresado($event)" okText="Aceptar" cancelText="Cancelar">
+            <ion-select-option  *ngFor="let p of proyectosInteresado" value="{{p.id_proyecto}}">{{p.nombre_proyecto}}</ion-select-option>
+            
+          </ion-select>
+        </ion-item>
+          <ion-card-content id="TPIcontent3" >
+            <canvas maintainAspectRatio="true"  class="charts2" #barCanvas3></canvas>
+          </ion-card-content>
+        </ion-card>
+    </div>
+    </mat-tab>
+    <mat-tab label="Progreso de Tareas">
+      <div class="ion-padding">
+        <ion-card >
+          <ion-card-header style="text-align: center;">
+            <ion-text color="primary"  class="title">Progreso de Tareas
+            </ion-text>
+          </ion-card-header>
+          <ion-item >
+            <ion-label position="floating">Nombre del Proyecto: </ion-label>
+          <ion-select class="texto"  placeholder="Seleccione un proyecto" (ionChange)="infoTareasInteresado($event)" okText="Aceptar" cancelText="Cancelar">
+            <ion-select-option  *ngFor="let p of proyectosInteresado" value="{{p.id_proyecto}}">{{p.nombre_proyecto}}</ion-select-option>
+            
+          </ion-select>
+        </ion-item>
+          <ion-card-content id="TPIcontent3" >
+            <canvas maintainAspectRatio="true"  class="charts2" #barCanvas7></canvas>
+          </ion-card-content>
+        </ion-card>
+    </div>
+    </mat-tab>
+  </mat-tab-group>
+</ion-content>
 
-      </div>
+
+
+<ion-content *ngIf="appComponent.cuentaActual=='Administrador'">
+  <mat-tab-group #tabs [selectedIndex]="cero">
+    <mat-tab label="Horas trabajadas por Desarrollador">
+      <div class="ion-padding">
+        <ion-card >
+          <ion-card-header style="text-align: center;">
+            <ion-text color="primary"  class="title">Horas trabajadas por Desarrollador
+            </ion-text>
+          </ion-card-header>
+          <ion-item >
+            <ion-label position="floating">Nombre del Proyecto: </ion-label>
+          <ion-select class="texto"  placeholder="Seleccione un proyecto" (ionChange)="horasTAdministrador($event)" okText="Aceptar" cancelText="Cancelar">
+            <ion-select-option *ngFor="let p of proyectosAdministrador"  value="{{p.id_proyecto}}">{{p.nombre_proyecto}}</ion-select-option>
+            
+          </ion-select>
+        </ion-item>
+          <ion-card-content id="TPIcontent" >
+            
+            <canvas maintainAspectRatio="true"  class="charts2" #barCanvas4></canvas>
+            
+          </ion-card-content>
+        </ion-card>
+    </div>
+    </mat-tab>
+    <mat-tab label="Tareas por Actividad">
+      <div class="ion-padding">
+        <ion-card >
+          <ion-card-header style="text-align: center;">
+            <ion-text color="primary"  class="title">Tareas por Actividad
+            </ion-text>
+          </ion-card-header>
+          <ion-item >
+            <ion-label position="floating">Nombre del Proyecto: </ion-label>
+          <ion-select class="texto"  placeholder="Seleccione un proyecto" (ionChange)="tareasAAdministrador($event)" okText="Aceptar" cancelText="Cancelar">
+            <ion-select-option *ngFor="let p of proyectosAdministrador" value="{{p.id_proyecto}}">{{p.nombre_proyecto}}</ion-select-option>
+            
+          </ion-select>
+        </ion-item>
+          <ion-card-content id="TPIcontent2" >
+            <canvas maintainAspectRatio="true"  class="charts2" #barCanvas5></canvas>
+          </ion-card-content>
+        </ion-card>
+    </div>
+    </mat-tab>
+    <mat-tab label="Tareas por Desarrollador">
+      <div class="ion-padding">
+        <ion-card >
+          <ion-card-header style="text-align: center;">
+            <ion-text color="primary"  class="title">Tareas por Desarrollador
+            </ion-text>
+          </ion-card-header>
+          <ion-item >
+            <ion-label position="floating">Nombre del Proyecto: </ion-label>
+          <ion-select class="texto"   placeholder="Seleccione un proyecto" (ionChange)="tareasDAdministrador($event)" okText="Aceptar" cancelText="Cancelar">
+            <ion-select-option *ngFor="let p of proyectosAdministrador" value="{{p.id_proyecto}}">{{p.nombre_proyecto}}</ion-select-option>
+            
+          </ion-select>
+        </ion-item>
+          <ion-card-content id="TPIcontent3" >
+            <canvas maintainAspectRatio="true"  class="charts2" #barCanvas6></canvas>
+          </ion-card-content>
+        </ion-card>
+    </div>
+    </mat-tab>
+    <mat-tab label="Progreso de Tareas">
+      <div class="ion-padding">
+        <ion-card >
+          <ion-card-header style="text-align: center;">
+            <ion-text color="primary"  class="title">Progreso de Tareas
+            </ion-text>
+          </ion-card-header>
+          <ion-item >
+            <ion-label position="floating">Nombre del Proyecto: </ion-label>
+          <ion-select class="texto"  placeholder="Seleccione un proyecto" (ionChange)="infoTareasAdministrador($event)" okText="Aceptar" cancelText="Cancelar">
+            <ion-select-option  *ngFor="let p of proyectosAdministrador" value="{{p.id_proyecto}}">{{p.nombre_proyecto}}</ion-select-option>
+            
+          </ion-select>
+        </ion-item>
+          <ion-card-content id="TPIcontent3" >
+            <canvas maintainAspectRatio="true"  class="charts2" #barCanvas8></canvas>
+          </ion-card-content>
+        </ion-card>
+    </div>
+    </mat-tab>
+  </mat-tab-group>
+</ion-content>
+
+
+<ion-content *ngIf="appComponent.cuentaActual=='Estudiante'">
+  <mat-tab-group #tabs [selectedIndex]="cero">
+    <mat-tab label="Progreso de Tareas">
+      <div class="ion-padding">
+        <ion-card >
+          <ion-card-header style="text-align: center;">
+            <ion-text color="primary"  class="title">Progreso de Tareas
+            </ion-text>
+          </ion-card-header>
+          <ion-card-content id="TPIcontent3" >
+            <canvas maintainAspectRatio="true"  class="charts2" #barCanvas9></canvas>
+          </ion-card-content>
+        </ion-card>
+    </div>
+    </mat-tab>
+    <mat-tab label="Atrasos y Adelantos">
+      <div class="ion-padding">
+        <ion-card >
+          <ion-card-header style="text-align: center;">
+            <ion-text color="primary"  class="title">Tareas Atrasadas
+            </ion-text>
+          </ion-card-header>
+          <ion-card-content id="TPIcontent3" >
+            <ion-item lines="full">
+              <ion-col size="6">
+                
+                  <ion-label color="tertiary" text-wrap  style="text-align: center">Tarea</ion-label>
+                </ion-col>
+              <ion-col size="6" >
+                  <ion-label color="tertiary" text-wrap style="text-align: center">Tiempo de atraso</ion-label>
+              </ion-col>
+            
+          </ion-item>
+            <ion-card *ngFor="let p of tareasAtrasadasE">
+              <ion-item>
+                <ion-col size="6"  >
+                    <ion-label  text-wrap  style="text-align: center">{{p[0]}}</ion-label>
+                </ion-col>
+                <ion-col size="6"  >
+                    <ion-label text-wrap style="text-align: center">{{p[1]}}</ion-label>
+                </ion-col>
+              </ion-item>
+            </ion-card>
+          </ion-card-content>
+          <ion-card-header style="text-align: center;">
+            <ion-text color="primary"  class="title">Tareas Adelantadas
+            </ion-text>
+          </ion-card-header>
+          <ion-card-content id="TPIcontent3" >
+            <ion-item lines="full">
+              <ion-col size="6">
+                
+                  <ion-label color="tertiary" text-wrap  style="text-align: center">Tarea</ion-label>
+                </ion-col>
+              <ion-col size="6" >
+                  <ion-label color="tertiary" text-wrap style="text-align: center">Tiempo de adelanto</ion-label>
+              </ion-col>
+            
+          </ion-item>
+            <ion-card *ngFor="let p of tareasAdelantadasE">
+              <ion-item>
+                <ion-col size="6"  >
+                    <ion-label  text-wrap  style="text-align: center">{{p[0]}}</ion-label>
+                </ion-col>
+                <ion-col size="6"  >
+                    <ion-label text-wrap style="text-align: center">{{p[1]}}</ion-label>
+                </ion-col>
+              </ion-item>
+            </ion-card>
+          </ion-card-content>
+        </ion-card>
+    </div>
+    </mat-tab>
+  </mat-tab-group>
+</ion-content>
+
+<ion-content *ngIf="appComponent.cuentaActual=='Desarrollador'">
+  <mat-tab-group #tabs [selectedIndex]="cero">
+    <mat-tab label="Progreso de Tareas">
+      <div class="ion-padding">
+        <ion-card >
+          <ion-card-header style="text-align: center;">
+            <ion-text color="primary"  class="title">Progreso de Tareas 
+            </ion-text>
+          </ion-card-header>
+          <ion-item >
+            <ion-label position="floating">Opción: </ion-label>
+          <ion-select class="texto"  placeholder="Seleccione una opción" (ionChange)="menuInfoTareasD($event)" okText="Aceptar" cancelText="Cancelar">
+            <ion-select-option   value="General">General</ion-select-option>
+            <ion-select-option  *ngFor="let p of proyectosDesarrollador" value="{{p.id_proyecto}}">{{p.nombre_proyecto}}</ion-select-option>
+            
+          </ion-select>
+        </ion-item>
+          <ion-card-content id="TPIcontent3" >
+            <canvas maintainAspectRatio="true"  class="charts2" #barCanvas10></canvas>
+          </ion-card-content>
+        </ion-card>
+    </div>
     </mat-tab>
   </mat-tab-group>
 </ion-content>
