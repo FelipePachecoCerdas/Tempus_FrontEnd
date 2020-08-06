@@ -11,34 +11,39 @@ const routes: Routes = [
   },
   {
     path: 'calendario-tareas',
-    loadChildren: () => import('./calendario-tareas/calendario-tareas.module').then( m => m.CalendarioTareasModule )
+    loadChildren: () => import('./calendario-tareas/calendario-tareas.module').then(m => m.CalendarioTareasModule)
+  },
+  {
+    path: 'calendario-proyecto',
+    loadChildren: () => import('./calendario-proyecto/calendario-proyecto.module').then(m => m.CalendarioTareasModule)
   },
   {
     path: 'folder/:id',
-    loadChildren: () => import('./folder/folder.module').then( m => m.FolderPageModule)
+    loadChildren: () => import('./folder/folder.module').then(m => m.FolderPageModule)
   },
   {
     path: 'inicio',
-    loadChildren: () => import('./inicio/inicio.module').then( m => m.InicioPageModule)
-  },  {
+    loadChildren: () => import('./inicio/inicio.module').then(m => m.InicioPageModule)
+  },
+  {
     path: 'iniciar-sesion',
-    loadChildren: () => import('./iniciar-sesion/iniciar-sesion.module').then( m => m.IniciarSesionPageModule)
+    loadChildren: () => import('./iniciar-sesion/iniciar-sesion.module').then(m => m.IniciarSesionPageModule)
   },
   {
     path: 'registro',
-    loadChildren: () => import('./registro/registro.module').then( m => m.RegistroPageModule)
+    loadChildren: () => import('./registro/registro.module').then(m => m.RegistroPageModule)
   },
   {
     path: 'perfil',
-    loadChildren: () => import('./perfil/perfil.module').then( m => m.PerfilPageModule)
+    loadChildren: () => import('./perfil/perfil.module').then(m => m.PerfilPageModule)
   },
   {
     path: 'bitacora',
-    loadChildren: () => import('./bitacora/bitacora.module').then( m => m.BitacoraPageModule)
+    loadChildren: () => import('./bitacora/bitacora.module').then(m => m.BitacoraPageModule)
   },
   {
     path: 'rendimiento',
-    loadChildren: () => import('./rendimiento/rendimiento.module').then( m => m.RendimientoPageModule)
+    loadChildren: () => import('./rendimiento/rendimiento.module').then(m => m.RendimientoPageModule)
   },
 
 
@@ -51,4 +56,4 @@ const routes: Routes = [
   ],
   exports: [RouterModule]
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

@@ -65,18 +65,29 @@
 
 }
 
-::ng-deep .mat-select-value{    
+.especial { 
+  ::ng-deep .mat-select-value{    
   text-align: center;
   font-weight: bold;
-  color: #6a64ff;
-  font-size: 1.5em;
+  color: #f54291;
+  font-size: 2em;
+}
 }
 
 .colorChachi {
   
     text-align: center;
     font-weight: bold;
-    color: #6a64ff;
+    color: #f54291;
     font-size: 1.5em;
   
+}
+
+.colorChachi2 {
+  
+  text-align: center;
+  font-weight: bold;
+  color: #6a64ff;
+  font-size: 1.5em;
+
 }

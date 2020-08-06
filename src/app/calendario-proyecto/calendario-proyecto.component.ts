@@ -105,6 +105,10 @@ import { PeriodoEspecifico } from '../tempus-models/periodo_especifico';
 import { PeriodoGeneral } from '../tempus-models/periodo_general';
 import { Etiqueta } from '../tempus-models/etiqueta';
 import { EtiquetaTarea } from '../tempus-models/etiqueta_tarea';
+import { ProyectoService } from '../services/proyecto.service';
+import { Proyecto } from '../tempus-models/proyecto';
+import { Actividad } from '../tempus-models/actividad';
+import { ActividadService } from '../services/actividad.service';
 
 registerLocaleData(localeEs);
 
@@ -157,6 +161,7 @@ function nuevoEvento(idTarea, inicio, final, nombre, color) {
     },
     cssClass: "myClass",
     draggable: true,
+    allDay: true,
   }
 }
 
@@ -285,9 +290,9 @@ export class DateFormatPipe extends DatePipe implements PipeTransform {
 };
 
 @Component({
-  selector: 'app-calendario-tareas',
-  templateUrl: './calendario-tareas.component.html',
-  styleUrls: ['./calendario-tareas.component.scss'],
+  selector: 'app-calendario-proyecto',
+  templateUrl: './calendario-proyecto.component.html',
+  styleUrls: ['./calendario-proyecto.component.scss'],
   providers: [
     {
       provide: CalendarDateFormatter,
@@ -296,7 +301,7 @@ export class DateFormatPipe extends DatePipe implements PipeTransform {
     }, DateFormatPipe
   ]
 })
-export class CalendarioTareasComponent {
+export class CalendarioProyectoComponent {
   @ViewChild('modalContent', { static: true }) modalContent: TemplateRef<any>;
   @ViewChild('listaPendientesModal', { static: true }) listaPendientesModal: TemplateRef<any>;
   @ViewChild('updateTareaModal', { static: true }) updateTareaModal: TemplateRef<any>;
@@ -381,6 +386,20 @@ export class CalendarioTareasComponent {
   etiquetasTareas: EtiquetaTarea[];
   etiqueta = new Etiqueta(undefined, "", "#6a64ff");
 
+  /* NEW */
+
+  proyectoActual = new Proyecto(undefined, "", "", undefined);
+  proyectos: Proyecto[] = [];
+
+
+  actividadActual = new Actividad(undefined, undefined, "", "", undefined, undefined);
+  actividad_aux = { fechaInicio: new Date().toISOString(), fechaFinal: new Date().toISOString(), proyecto: undefined };
+
+  proyectoEscogido = "";
+
+  correoDes = "";
+  correoInt = "";
+
   @ViewChild("tabs", { static: false }) tabs: MatTabGroup;
 
   activeDayIsOpen: boolean = true;
@@ -401,9 +420,12 @@ export class CalendarioTareasComponent {
     public horarioEspecificoPorDiaService: HorarioEspecificoPorDiaService,
     public periodoGeneralService: PeriodoGeneralService,
     public periodoEspecificoService: PeriodoEspecificoService,
-    public dateFormatPipe: DateFormatPipe) {
+    public dateFormatPipe: DateFormatPipe,
+    public proyectoService: ProyectoService,
+    public actividadService: ActividadService,
+    public usuarioService: UsuarioService) {
     //this.resetDB();
-    this.etiqueta.nombre_etiqueta
+    this.actividadActual.descripcion_actividad
   }
 
   private readonly darkThemeClass = 'dark-theme';
@@ -430,11 +452,83 @@ export class CalendarioTareasComponent {
     console.log(this.actualUser);
     await this.getTareas();
     await this.getEtiquetas();
+    await this.getProyectos();
 
-    this.crearEventos();
+    await this.crearEventos();
     this.calcularTareasSinProcesar();
     await this.cambiarDiaEscogido();
     await this.cambiarFechaEscogida();
+
+    if (this.proyectos.length != 0) this.proyectoEscogido = this.proyectos[0].nombre_proyecto;
+  }
+
+  async agregarDesarrollador() {
+    let usuarios_ = await this.usuarioService.findAll().toPromise() as Usuario[];
+    let usuario: Usuario = undefined;
+    for (let us of usuarios_) if (us.correo_electronico == this.correoDes) usuario = us;
+
+    if (usuario == undefined) {
+      await this.tostearPan("¡No se ha encontrado ningún usuario asociado al correo electrónico indicado!");
+      return;
+    }
+
+    await this.tostearPan("¡Se ha enviado una invitación a " + usuario.nombre + " " + usuario.apellidos + " para ser parte del proyecto " + this.proyectoEscogido + " como desarrollador!");
+  }
+
+  async agregarInteresado() {
+    let usuarios_ = await this.usuarioService.findAll().toPromise() as Usuario[];
+    let usuario: Usuario = undefined;
+    for (let us of usuarios_) if (us.correo_electronico == this.correoInt) usuario = us;
+
+    if (usuario == undefined) {
+      await this.tostearPan("¡No se ha encontrado ningún usuario asociado al correo electrónico indicado!");
+      return;
+    }
+
+    await this.tostearPan("¡Se ha enviado una invitación a " + usuario.nombre + " " + usuario.apellidos + " para ser parte del proyecto " + this.proyectoEscogido + " como interesado!");
+  }
+
+
+
+  async registrarProyecto() {
+    this.proyectoActual.administrador_proyecto = this.actualUser.id_usuario;
+    let maxId = 0;
+    let proyectos_ = await this.proyectoService.findAll().toPromise() as Proyecto[];
+    for (let proy of proyectos_) if (proy.id_proyecto > maxId) maxId = proy.id_proyecto;
+    this.proyectoActual.id_proyecto = maxId + 1;
+
+    await this.proyectoService.create(this.proyectoActual).toPromise();
+    await this.getProyectos();
+    await this.crearEventos();
+    await this.tostearPan("¡El proyecto " + this.proyectoActual.nombre_proyecto + " ha sido creado con éxito!");
+  }
+
+  async registrarActividad() {
+    let idProyecto: number;
+    for (let proy of (await this.proyectoService.findAll().toPromise() as Proyecto[]))
+      if (proy.nombre_proyecto == this.actividad_aux.proyecto) idProyecto = proy.id_proyecto;
+
+    this.actividadActual.id_proyecto = idProyecto;
+    let maxId = 0;
+    let actividades_ = await this.actividadService.findAll().toPromise() as Actividad[];
+    for (let act of actividades_) if (act.id_actividad > maxId) maxId = act.id_actividad;
+    this.actividadActual.id_actividad = maxId + 1;
+
+    await this.actividadService.create({
+      ...this.actividadActual,
+      fecha_inicio: this.actividad_aux.fechaInicio,
+      fecha_finalizacion: this.actividad_aux.fechaFinal,
+    }).toPromise();
+    await this.getProyectos();
+    await this.crearEventos();
+    await this.tostearPan("¡La actividad " + this.actividadActual.nombre_actividad + " ha sido creada con éxito!");
+  }
+
+  async getProyectos() {
+    let proyectos_ = await this.proyectoService.findAll().toPromise() as Proyecto[];
+    this.proyectos = [];
+    for (let proy of proyectos_) if (proy.administrador_proyecto == this.actualUser.id_usuario) this.proyectos.push(proy);
+
   }
 
   async getEtiquetas() {
@@ -693,22 +787,49 @@ export class CalendarioTareasComponent {
     this.tareasSinProcesar = this.tareasPendientes.length;
   }
 
-  crearEventos() {
+  async crearEventos() {
     this.events = [];
+    await this.getProyectos();
+    let actividades: Actividad[] = [];
+    let actividades_ = await this.actividadService.findAll().toPromise() as Actividad[];
+    for (let proy of this.proyectos)
+      for (let act of actividades_)
+        if (act.id_proyecto == proy.id_proyecto) actividades.push(act);
 
-    for (let tarea of this.tareas) {
+
+    for (let act of actividades) {
+      console.log(act);
+
       let colorTarea = undefined;
-      for (let color of this.colores) if (color.id_tarea == tarea.id_tarea) colorTarea = color.color_tarea;
+      //for (let color of this.colores) if (color.id_tarea == tarea.id_tarea) colorTarea = color.color_tarea;
       if (colorTarea == undefined) {
         colorTarea = randomColor();
-        this.colores.push({ id_tarea: tarea.id_tarea, color_tarea: colorTarea });
+        //this.colores.push({ id_tarea: tarea.id_tarea, color_tarea: colorTarea });
       }
-      for (let periodo of this.tareas_periodos) {
-        if (tarea.id_tarea == periodo.id_tarea) {
-          this.events.push(nuevoEvento(tarea.id_tarea, periodo.fecha_hora_inicio_original, periodo.fecha_hora_final_original, tarea.nombre_tarea, colorTarea));
-        }
-      }
+
+
+      let vals = (act.fecha_inicio as unknown as string).split("-");
+      let date = new Date();
+      date.setFullYear(Number.parseInt(vals[0]));
+      date.setDate(Number.parseInt(vals[2]));
+      date.setMonth(Number.parseInt(vals[1]) - 1);
+
+      let vals2 = (act.fecha_finalizacion as unknown as string).split("-");
+      let date2 = new Date();
+      date2.setFullYear(Number.parseInt(vals2[0]));
+      date2.setDate(Number.parseInt(vals2[2]));
+      date2.setMonth(Number.parseInt(vals2[1]) - 1);
+
+      let proyecto: Proyecto;
+      for (let proy of this.proyectos) if (act.id_proyecto == proy.id_proyecto) proyecto = proy;
+
+      this.events.push(nuevoEvento(act.id_actividad, date, date2, act.nombre_actividad + " (" + proyecto.nombre_proyecto + ")", colorTarea));
+
     }
+
+    this.dayClicked({ date: new Date(), events: [] });
+
+
   }
 
   cambiarConfigAuto() {
@@ -786,7 +907,7 @@ export class CalendarioTareasComponent {
     //this.tareas_automaticas = [];
     await this.getTareas();
     this.calcularTareasSinProcesar();
-    this.crearEventos();
+    await this.crearEventos();
 
     await this.tostearPan('¡Las tareas automáticas han sido programadas con éxito!');
   }
@@ -822,7 +943,7 @@ export class CalendarioTareasComponent {
         // meter en BD
       }
       await this.getTareas();
-      this.crearEventos();
+      await this.crearEventos();
     } else {
       this.tareaAutomatica.id_tarea = maxId + 1;
       this.tareaAutomatica.restriccion_inicio = (this.periodoAuto.inicio == "") ? undefined : isoStringToDate(this.periodoAuto.inicio);
@@ -847,7 +968,7 @@ export class CalendarioTareasComponent {
 
     await this.getTareas();
     this.calcularTareasSinProcesar();
-    this.crearEventos();
+    await this.crearEventos();
     this.modal.dismissAll();
     await this.tostearPan('¡La tarea \"' + this.tareaActual_upd.nombre_tarea + '\" ha sido eliminada permanentemente!');
 
@@ -930,7 +1051,7 @@ export class CalendarioTareasComponent {
 
     await this.getTareas();
     this.calcularTareasSinProcesar();
-    this.crearEventos();
+    await this.crearEventos();
     this.modal.dismissAll();
     await this.tostearPan('¡La tarea \"' + this.tareaActual_upd.nombre_tarea + '\" ha sido actualizada con éxito!');
 
@@ -949,7 +1070,7 @@ export class CalendarioTareasComponent {
       }
       this.events = [];
       await this.getTareas();
-      this.crearEventos();
+      await this.crearEventos();
     } else {
       this.tareaAutomatica.id_tarea = 0 + 1;
       this.tareaAutomatica.restriccion_inicio = (this.periodoAuto.inicio == "") ? undefined : isoStringToDate(this.periodoAuto.inicio);
@@ -1107,7 +1228,7 @@ export class CalendarioTareasComponent {
     //return;
     await this.tareaPeriodoService.update(tareaPeriodoEvento.id_tarea, this.pasarDateIso(addHours(event.start, 6)), this.pasarDateIso(addHours(event.end, 6)), tareaPeriodoEvento).toPromise();
     await this.getTareas();
-    this.crearEventos();
+    await this.crearEventos();
     this.calcularTareasSinProcesar();
 
     await this.tostearPan('¡El periodo de la tarea \"' + tareaEvento.nombre_tarea + '\" ha sido desplazado con éxito!');
