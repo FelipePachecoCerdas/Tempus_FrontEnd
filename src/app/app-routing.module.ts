@@ -15,7 +15,7 @@ const routes: Routes = [
   },
   {
     path: 'calendario-proyecto',
-    loadChildren: () => import('./calendario-proyecto/calendario-proyecto.module').then(m => m.CalendarioTareasModule)
+    loadChildren: () => import('./calendario-proyecto/calendario-proyecto.module').then(m => m.CalendarioProyectoModule)
   },
   {
     path: 'folder/:id',

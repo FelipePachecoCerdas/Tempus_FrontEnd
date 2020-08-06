@@ -667,7 +667,7 @@
 
       <ion-card class="tarjeta">
         <ion-card-header>
-          <mat-select class="especial" [(ngModel)]="proyectoEscogido" (selectionChange)="cambiarProyectoEscogido()">
+          <mat-select class="especial" [(ngModel)]="proyectoEscogido" (selectionChange)="getPersonal()">
             <mat-option *ngFor="let proy of proyectos" [value]="proy.nombre_proyecto">
               {{proy.nombre_proyecto}}
             </mat-option>
@@ -717,27 +717,18 @@
 
 
               <div>
-                <ion-list *ngFor="let periodo of periodosGenerales_Aux; index as i">
+                <ion-list *ngFor="let des of desarrolladores; index as i">
                   <ion-card>
                     <ion-card-header>
-                      <ion-item>
-                        <ion-label> Periodo No.{{i+1}} </ion-label>
-                        <ion-button shape="round" (click)="borrarPeriodo_PG(i)">
-                          <ion-icon shape="circle" slot="icon-only" name="trash-outline"></ion-icon>
-                        </ion-button>
-                      </ion-item>
                     </ion-card-header>
 
                     <ion-card-content>
-                      <ion-label>
-                        &nbsp;&nbsp;&nbsp;
-                        Hasta: {{periodo.inicio | date:'hh:mm a' }}
-                      </ion-label>
-                      <br />
-                      <ion-label>&nbsp;&nbsp;&nbsp;
-                        Desde:
-                        {{periodo.final | date:'hh:mm a' }}
-                      </ion-label>
+                      <ion-item>
+                        <ion-label> {{des}} </ion-label>
+                        <ion-button shape="round" (click)="borrarDesarrollador(i)">
+                          <ion-icon shape="circle" slot="icon-only" name="trash-outline"></ion-icon>
+                        </ion-button>
+                      </ion-item>
 
                     </ion-card-content>
 
@@ -748,7 +739,7 @@
 
                 </ion-list>
               </div>
-              <ion-card *ngIf="periodosGenerales_Aux.length == 0">
+              <ion-card *ngIf="desarrolladores.length == 0">
                 <ion-card-header>
                   <ion-label style="color: white;"> No hay desarrolladores para
                     <ion-label color="primary" style=" text-transform: capitalize;">{{proyectoEscogido}}</ion-label>
@@ -809,27 +800,19 @@
 
 
               <div>
-                <ion-list *ngFor="let periodo of periodosGenerales_Aux; index as i">
+                <ion-list *ngFor="let inte of interesados; index as i">
                   <ion-card>
                     <ion-card-header>
-                      <ion-item>
-                        <ion-label> Periodo No.{{i+1}} </ion-label>
-                        <ion-button shape="round" (click)="borrarPeriodo_PG(i)">
-                          <ion-icon shape="circle" slot="icon-only" name="trash-outline"></ion-icon>
-                        </ion-button>
-                      </ion-item>
+
                     </ion-card-header>
 
                     <ion-card-content>
-                      <ion-label>
-                        &nbsp;&nbsp;&nbsp;
-                        Hasta: {{periodo.inicio | date:'hh:mm a' }}
-                      </ion-label>
-                      <br />
-                      <ion-label>&nbsp;&nbsp;&nbsp;
-                        Desde:
-                        {{periodo.final | date:'hh:mm a' }}
-                      </ion-label>
+                      <ion-item>
+                        <ion-label> {{inte}} </ion-label>
+                        <ion-button shape="round" (click)="borrarInteresado(i)">
+                          <ion-icon shape="circle" slot="icon-only" name="trash-outline"></ion-icon>
+                        </ion-button>
+                      </ion-item>
 
                     </ion-card-content>
 
@@ -840,7 +823,7 @@
 
                 </ion-list>
               </div>
-              <ion-card *ngIf="periodosGenerales_Aux.length == 0">
+              <ion-card *ngIf="interesados.length == 0">
                 <ion-card-header>
                   <ion-label style="color: white;"> No hay interesados para
                     <ion-label color="primary" style=" text-transform: capitalize;">{{proyectoEscogido}}</ion-label>

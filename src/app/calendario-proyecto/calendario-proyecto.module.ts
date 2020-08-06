@@ -47,7 +47,6 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { LOCALE_ID } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 
-
 @NgModule({
   imports: [
     CommonModule,
@@ -108,4 +107,4 @@ import { HttpClientModule } from '@angular/common/http';
     //otherProviders...
   ]
 })
-export class CalendarioTareasModule { }
+export class CalendarioProyectoModule { }

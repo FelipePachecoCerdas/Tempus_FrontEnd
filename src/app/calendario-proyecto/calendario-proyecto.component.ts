@@ -396,6 +396,8 @@ export class CalendarioProyectoComponent {
   actividad_aux = { fechaInicio: new Date().toISOString(), fechaFinal: new Date().toISOString(), proyecto: undefined };
 
   proyectoEscogido = "";
+  desarrolladores = [];
+  interesados = [];
 
   correoDes = "";
   correoInt = "";
@@ -459,7 +461,9 @@ export class CalendarioProyectoComponent {
     await this.cambiarDiaEscogido();
     await this.cambiarFechaEscogida();
 
+
     if (this.proyectos.length != 0) this.proyectoEscogido = this.proyectos[0].nombre_proyecto;
+    await this.getPersonal();
   }
 
   async agregarDesarrollador() {
@@ -473,6 +477,33 @@ export class CalendarioProyectoComponent {
     }
 
     await this.tostearPan("¡Se ha enviado una invitación a " + usuario.nombre + " " + usuario.apellidos + " para ser parte del proyecto " + this.proyectoEscogido + " como desarrollador!");
+  }
+
+  async getPersonal() {
+
+    let proyectote: Proyecto;
+    for (let proy of (await this.proyectoService.findAll().toPromise() as Proyecto[]))
+      if (proy.nombre_proyecto == this.proyectoEscogido) proyectote = proy;
+
+    this.desarrolladores = [];
+    this.interesados = [];
+    if (proyectote.nombre_proyecto == "Tempus") {
+      this.desarrolladores = ["Jeremy Tencio Morales", "Felipe Pacheco Cerdas"];
+      this.interesados = ["Jeremy Tencio Morales"];
+    }
+    if (proyectote.nombre_proyecto == "KAP") {
+      this.desarrolladores = [];
+      this.interesados = ["Felipe Pacheco Cerdas"];
+    }
+
+  }
+
+  borrarDesarrollador(i: number) {
+    this.desarrolladores.splice(i, 1);
+  }
+
+  borrarInteresado(i: number) {
+    this.interesados.splice(i, 1);
   }
 
   async agregarInteresado() {

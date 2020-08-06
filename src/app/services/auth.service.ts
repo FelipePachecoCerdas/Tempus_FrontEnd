@@ -9,19 +9,19 @@ import { UsuarioService } from '../services/usuario.service'
 export class AuthService {
 
   private sesion = window.localStorage;
-  loggedIn:boolean = false;
-  public selectedIndex=0;
+  loggedIn: boolean = false;
+  public selectedIndex = 0;
 
-  constructor(private usuarioService: UsuarioService) { 
-    let user = JSON.parse( this.sesion.getItem("user") ) as Usuario
-    let selectedIndex =JSON.parse(this.sesion.getItem("selectedIndex")) as number
-    let cuentaActual =this.sesion.getItem("cuentaActual")
-    if(user){
+  constructor(private usuarioService: UsuarioService) {
+    let user = JSON.parse(this.sesion.getItem("user")) as Usuario
+    let selectedIndex = JSON.parse(this.sesion.getItem("selectedIndex")) as number
+    let cuentaActual = this.sesion.getItem("cuentaActual")
+    if (user) {
       this.loggedIn = true
       this.actualUser = user;
-      this.selectedIndex =selectedIndex
-      this.cuentaActual=cuentaActual
-    } 
+      this.selectedIndex = selectedIndex
+      this.cuentaActual = cuentaActual
+    }
   }
   public cuentaActual = 'Estudiante';
   public actualUser: Usuario =
@@ -40,22 +40,25 @@ export class AuthService {
     return new Promise((resolve, rejected) => {
 
       this.actualUser = usuario;
-      
-      this.sesion.setItem("user",usuario!=null?JSON.stringify(usuario):null);
-      this.sesion.setItem("cuentaActual","Estudiante")
-      if(usuario!=null){if (Object.keys(usuario).length === 0){
-        rejected(null);
-      };
-      resolve(usuario);}
+
+      this.sesion.setItem("user", usuario != null ? JSON.stringify(usuario) : null);
+      this.sesion.setItem("cuentaActual", "Estudiante")
+      if (usuario != null) {
+        if (Object.keys(usuario).length === 0) {
+          rejected(null);
+        };
+        resolve(usuario);
+      }
     })
 
   }
-  menuIndex(index){
-    this.sesion.setItem("selectedIndex",JSON.stringify(index));
+  menuIndex(index) {
+    this.sesion.setItem("selectedIndex", JSON.stringify(index));
   }
 
-  currentAccount(cuenta){
-    this.sesion.setItem("cuentaActual",cuenta)
+  currentAccount(cuenta) {
+    this.cuentaActual = cuenta;
+    this.sesion.setItem("cuentaActual", cuenta)
   }
 }
 
